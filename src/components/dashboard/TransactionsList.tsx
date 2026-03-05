@@ -7,7 +7,7 @@ import useSWR from 'swr'
 const fetcher = (url: string) => fetch(url).then(res => res.json())
 
 export default function TransactionsList() {
-    const { data: transactions, error, isLoading } = useSWR('http://127.0.0.1:8000/api/dashboard/transactions/recent/', fetcher)
+    const { data: transactions, error, isLoading } = useSWR(`${process.env.NEXT_PUBLIC_API_URL}dashboard/transactions/recent/`, fetcher)
 
     if (isLoading) {
         return <Card className="col-span-1 lg:col-span-3 h-[400px] animate-pulse bg-white/5 border border-white/10" />

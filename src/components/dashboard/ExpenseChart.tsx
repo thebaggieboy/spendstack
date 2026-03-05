@@ -8,7 +8,7 @@ import useSWR from 'swr'
 const fetcher = (url: string) => fetch(url).then(res => res.json())
 
 export default function ExpenseChart() {
-    const { data: rawData, error, isLoading } = useSWR('http://127.0.0.1:8000/api/dashboard/cash-flow/', fetcher)
+    const { data: rawData, error, isLoading } = useSWR(`${process.env.NEXT_PUBLIC_API_URL}dashboard/cash-flow/`, fetcher)
 
     if (isLoading) {
         return <Card className="col-span-1 lg:col-span-4 h-[400px] animate-pulse bg-white/5 border border-white/10" />

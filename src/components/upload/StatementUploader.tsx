@@ -35,7 +35,7 @@ export default function StatementUploader() {
         formData.append('file', file)
 
         try {
-            const res = await fetch('http://127.0.0.1:8000/api/analysis/upload/', {
+            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}analysis/upload/`, {
                 method: 'POST',
                 body: formData
             })

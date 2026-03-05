@@ -7,7 +7,7 @@ import useSWR from 'swr'
 const fetcher = (url: string) => fetch(url).then(res => res.json())
 
 export default function OverviewCards() {
-    const { data, error, isLoading } = useSWR('http://127.0.0.1:8000/api/dashboard/overview/', fetcher)
+    const { data, error, isLoading } = useSWR(`${process.env.NEXT_PUBLIC_API_URL}dashboard/overview/`, fetcher)
 
     if (isLoading) {
         return <div className="animate-pulse h-32 bg-white/5 rounded-xl w-full"></div>

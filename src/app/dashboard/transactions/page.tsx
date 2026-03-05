@@ -12,7 +12,7 @@ export default function TransactionsPage() {
     const [searchQuery, setSearchQuery] = useState("")
 
     // We'll use the same endpoint but eventually this could be paginated
-    const { data: transactions, isLoading } = useSWR('http://127.0.0.1:8000/api/dashboard/transactions/recent/', fetcher)
+    const { data: transactions, isLoading } = useSWR(`${process.env.NEXT_PUBLIC_API_URL}dashboard/transactions/recent/`, fetcher)
 
     const formatNaira = (amount: number) => {
         return new Intl.NumberFormat('en-NG', { style: 'currency', currency: 'NGN' }).format(amount)
