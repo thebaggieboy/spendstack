@@ -78,7 +78,7 @@ export default function ExpenseChart() {
                                 width={60}
                             />
                             <Tooltip
-                                formatter={(value: number) => [formatNairaTooltip(value), undefined]}
+                                formatter={(value: any) => [formatNairaTooltip(value as number), undefined]}
                                 contentStyle={{
                                     backgroundColor: 'rgba(10, 10, 10, 0.8)',
                                     border: '1px solid rgba(255,255,255,0.1)',
