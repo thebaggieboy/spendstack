@@ -3,20 +3,23 @@
 import { useState } from "react"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/Card"
 import { Input } from "@/components/ui/Input"
-import { Search, ArrowDownRight, ArrowUpRight, ListFilter, Download, Calendar } from "lucide-react"
+import { Search, ArrowDownRight, ArrowUpRight, ListFilter, Download, Calendar, Loader2 } from "lucide-react"
 import useSWR from "swr"
+import { formatNaira } from '@/lib/utils';
+import { fetchWithAuth as fetcher } from '@/lib/fetcher';
+import { useSearchParams } from 'next/navigation'
+import { Suspense } from "react"
 
-const fetcher = (url: string) => fetch(url).then(res => res.json())
-
-export default function TransactionsPage() {
+function TransactionsContent() {
     const [searchQuery, setSearchQuery] = useState("")
+    const searchParams = useSearchParams()
+    const statementId = searchParams.get('statement_id')
 
-    // We'll use the same endpoint but eventually this could be paginated
-    const { data: transactions, isLoading } = useSWR(`${process.env.NEXT_PUBLIC_API_URL}dashboard/transactions/recent/`, fetcher)
+    const endpoint = statementId
+        ? `${process.env.NEXT_PUBLIC_API_URL}transactions/?statement_id=${statementId}`
+        : `${process.env.NEXT_PUBLIC_API_URL}transactions/`;
 
-    const formatNaira = (amount: number) => {
-        return new Intl.NumberFormat('en-NG', { style: 'currency', currency: 'NGN' }).format(amount)
-    }
+    const { data: transactions, isLoading } = useSWR(endpoint, fetcher)
 
     const filteredTransactions = transactions?.filter((tx: any) =>
         tx.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -31,11 +34,11 @@ export default function TransactionsPage() {
                     <p className="text-muted-foreground mt-1">View and manage all your financial activity.</p>
                 </div>
                 <div className="flex items-center gap-2 w-full sm:w-auto">
-                    <button className="flex items-center gap-2 px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-sm font-medium hover:bg-white/10 transition text-white">
+                    <button disabled title="Coming soon" className="flex items-center gap-2 px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-sm font-medium hover:bg-white/10 transition text-white disabled:opacity-50 disabled:cursor-not-allowed">
                         <Download className="h-4 w-4" />
                         Export
                     </button>
-                    <button className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg text-sm font-medium hover:bg-primary/90 transition shadow-lg shadow-primary/20">
+                    <button disabled title="Coming soon" className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg text-sm font-medium hover:bg-primary/90 transition shadow-lg shadow-primary/20 disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none">
                         <ListFilter className="h-4 w-4" />
                         Filters
                     </button>
@@ -127,5 +130,17 @@ export default function TransactionsPage() {
                 </CardContent>
             </Card>
         </div>
+    )
+}
+
+export default function TransactionsPage() {
+    return (
+        <Suspense fallback={
+            <div className="flex justify-center items-center py-20">
+                <Loader2 className="h-8 w-8 animate-spin text-primary" />
+            </div>
+        }>
+            <TransactionsContent />
+        </Suspense>
     )
 }

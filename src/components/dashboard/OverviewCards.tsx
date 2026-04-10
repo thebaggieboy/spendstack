@@ -1,10 +1,10 @@
 "use client"
 
 import { Card, CardContent } from "@/components/ui/Card"
-import { Wallet, TrendingDown, TrendingUp, PiggyBank } from "lucide-react"
+import { Wallet, TrendingUp, TrendingDown, Target, Loader2, PiggyBank } from 'lucide-react';
 import useSWR from 'swr'
-
-const fetcher = (url: string) => fetch(url).then(res => res.json())
+import { fetchWithAuth as fetcher } from '@/lib/fetcher';
+import { formatNaira } from '@/lib/utils';
 
 export default function OverviewCards() {
     const { data, error, isLoading } = useSWR(`${process.env.NEXT_PUBLIC_API_URL}dashboard/overview/`, fetcher)
@@ -15,10 +15,6 @@ export default function OverviewCards() {
 
     if (error || !data) {
         return <div className="text-red-400">Failed to load overview data</div>
-    }
-
-    const formatNaira = (amount: number) => {
-        return new Intl.NumberFormat('en-NG', { style: 'currency', currency: 'NGN' }).format(amount)
     }
 
     const stats = [

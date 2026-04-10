@@ -3,8 +3,8 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/Card"
 import { ListFilter, ArrowDownRight, ArrowUpRight } from "lucide-react"
 import useSWR from 'swr'
-
-const fetcher = (url: string) => fetch(url).then(res => res.json())
+import { formatNaira } from '@/lib/utils';
+import { fetchWithAuth as fetcher } from '@/lib/fetcher';
 
 export default function TransactionsList() {
     const { data: transactions, error, isLoading } = useSWR(`${process.env.NEXT_PUBLIC_API_URL}dashboard/transactions/recent/`, fetcher)

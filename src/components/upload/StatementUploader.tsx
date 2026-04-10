@@ -35,8 +35,15 @@ export default function StatementUploader() {
         formData.append('file', file)
 
         try {
+            const token = localStorage.getItem("accessToken");
+            const headers: HeadersInit = {};
+            if (token) {
+                headers["Authorization"] = `Bearer ${token}`;
+            }
+
             const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}analysis/upload/`, {
                 method: 'POST',
+                headers,
                 body: formData
             })
 

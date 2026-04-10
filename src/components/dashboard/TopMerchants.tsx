@@ -1,10 +1,10 @@
 "use client"
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/Card"
-import { Building2, ArrowUpRight } from "lucide-react"
+import { Store, CreditCard, Coffee, ShoppingBag, Zap, Loader2, Building2, ArrowUpRight } from 'lucide-react';
 import useSWR from 'swr'
-
-const fetcher = (url: string) => fetch(url).then(res => res.json())
+import { fetchWithAuth as fetcher } from '@/lib/fetcher';
+import { formatNaira } from '@/lib/utils';
 
 export default function TopMerchants() {
     const { data: merchants, error, isLoading } = useSWR(`${process.env.NEXT_PUBLIC_API_URL}dashboard/top-merchants/`, fetcher)
@@ -21,10 +21,6 @@ export default function TopMerchants() {
                 <p className="text-sm mt-2">Upload a bank statement to see where you spend the most.</p>
             </Card>
         )
-    }
-
-    const formatNaira = (amount: number) => {
-        return new Intl.NumberFormat('en-NG', { style: 'currency', currency: 'NGN' }).format(amount)
     }
 
     // Find max for the progress bar
