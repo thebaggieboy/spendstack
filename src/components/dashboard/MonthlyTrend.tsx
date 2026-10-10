@@ -39,14 +39,14 @@ const CustomTooltip = ({ active, payload, label }: any) => {
         <div
             className="rounded-xl px-4 py-3 text-sm space-y-1.5"
             style={{
-                backgroundColor: "rgba(10,10,10,0.9)",
-                border: "1px solid rgba(255,255,255,0.08)",
+                backgroundColor: "#ffffff",
+                border: "1px solid hsl(240 6% 90%)",
                 backdropFilter: "blur(12px)",
-                color: "white",
-                boxShadow: "0 10px 25px -5px rgba(0,0,0,0.5)",
+                color: "#18181b",
+                boxShadow: "0 10px 25px -5px rgba(24,24,27,0.12)",
             }}
         >
-            <p className="font-semibold text-white mb-2">{label}</p>
+            <p className="font-semibold text-foreground mb-2">{label}</p>
             <p className="flex justify-between gap-6">
                 <span className="text-muted-foreground">Income</span>
                 <span className="text-emerald-400 font-medium">{formatNaira(income)}</span>
@@ -55,7 +55,7 @@ const CustomTooltip = ({ active, payload, label }: any) => {
                 <span className="text-muted-foreground">Expenses</span>
                 <span className="text-rose-400 font-medium">{formatNaira(expenses)}</span>
             </p>
-            <div className="border-t border-white/10 pt-1.5 mt-1">
+            <div className="border-t border-border pt-1.5 mt-1">
                 <p className="flex justify-between gap-6">
                     <span className="text-muted-foreground">Net</span>
                     <span className={`font-bold ${net >= 0 ? "text-emerald-400" : "text-rose-400"}`}>
@@ -76,7 +76,7 @@ export default function MonthlyTrend() {
     const cardBase = "col-span-1 lg:col-span-4"
 
     if (isLoading) {
-        return <Card className={`${cardBase} h-[380px] animate-pulse bg-white/5 border border-white/10`} />
+        return <Card className={`${cardBase} h-[380px] animate-pulse bg-muted`} />
     }
 
     if (error) {
@@ -89,8 +89,8 @@ export default function MonthlyTrend() {
 
     if (!rawData || rawData.length === 0) {
         return (
-            <Card className={`${cardBase} h-[380px] flex flex-col items-center justify-center gap-4 border border-dashed border-white/10`}>
-                <div className="p-4 rounded-full bg-white/5 border border-white/10">
+            <Card className={`${cardBase} h-[380px] flex flex-col items-center justify-center gap-4 border-dashed`}>
+                <div className="p-4 rounded-full bg-muted border border-border">
                     <UploadCloud className="h-8 w-8 text-muted-foreground" />
                 </div>
                 <div className="text-center space-y-1">
@@ -151,8 +151,8 @@ export default function MonthlyTrend() {
                                 className="opacity-50"
                                 width={60}
                             />
-                            <ReferenceLine y={0} stroke="rgba(255,255,255,0.08)" />
-                            <Tooltip content={<CustomTooltip />} cursor={{ fill: "rgba(255,255,255,0.03)" }} />
+                            <ReferenceLine y={0} stroke="rgba(24,24,27,0.12)" />
+                            <Tooltip content={<CustomTooltip />} cursor={{ fill: "rgba(24,24,27,0.04)" }} />
 
                             <Bar dataKey="income" name="Income" radius={[4, 4, 0, 0]} maxBarSize={32}>
                                 {rawData.map((_, i) => (

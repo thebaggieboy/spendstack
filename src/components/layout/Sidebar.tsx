@@ -40,8 +40,8 @@ function NavLinks({ onNavigate }: { onNavigate?: () => void }) {
                     href={route.href}
                     onClick={onNavigate}
                     className={cn(
-                        "text-sm group flex p-3 w-full justify-start font-medium cursor-pointer hover:text-white hover:bg-white/5 rounded-lg transition-all duration-150",
-                        pathname === route.href ? "bg-white/10 text-white" : "text-zinc-400"
+                        "text-sm group flex p-3 w-full justify-start font-medium cursor-pointer hover:text-foreground hover:bg-muted rounded-lg transition-all duration-150",
+                        pathname === route.href ? "bg-primary/10 text-primary" : "text-muted-foreground"
                     )}
                 >
                     <div className="flex items-center flex-1 gap-3">
@@ -73,7 +73,7 @@ export default function Sidebar() {
     return (
         <>
             {/* ── Desktop Sidebar (always visible ≥ md) ──────────────── */}
-            <aside className="hidden md:flex flex-col h-full w-64 shrink-0 bg-card/30 backdrop-blur-2xl border-r border-white/5 py-6 px-3 z-50 rounded-tr-3xl">
+            <aside className="hidden md:flex flex-col h-full w-64 shrink-0 bg-white border-r border-border py-6 px-3 z-50">
                 <Logo />
                 <nav className="flex-1 overflow-y-auto">
                     <NavLinks />
@@ -99,7 +99,7 @@ export default function Sidebar() {
                 {/* Close button */}
                 <button
                     onClick={close}
-                    className="absolute top-4 right-4 p-1.5 rounded-md text-muted-foreground hover:text-foreground hover:bg-white/5 transition"
+                    className="absolute top-4 right-4 p-1.5 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted transition"
                     aria-label="Close sidebar"
                 >
                     <X className="h-5 w-5" />

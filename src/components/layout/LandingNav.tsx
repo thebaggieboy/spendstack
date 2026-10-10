@@ -10,7 +10,7 @@ const NAV_LINKS = [
     { label: "Features", href: "#features" },
     { label: "Tax Engine", href: "#tax" },
     { label: "AI Advisor", href: "#ai" },
-    { label: "Pricing", href: "#pricing" },
+    { label: "How it works", href: "#how-it-works" },
 ]
 
 export default function LandingNav() {
@@ -56,7 +56,7 @@ export default function LandingNav() {
                             <a
                                 key={l.label}
                                 href={l.href}
-                                className="px-3 py-1.5 text-sm text-muted-foreground hover:text-foreground rounded-md hover:bg-white/5 transition-colors"
+                                className="px-3 py-1.5 text-sm text-muted-foreground hover:text-foreground rounded-md hover:bg-muted transition-colors"
                             >
                                 {l.label}
                             </a>
@@ -80,7 +80,7 @@ export default function LandingNav() {
 
                     {/* Mobile hamburger */}
                     <button
-                        className="md:hidden p-2 rounded-md text-muted-foreground hover:text-foreground hover:bg-white/5 transition"
+                        className="md:hidden p-2 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted transition"
                         onClick={() => setOpen(true)}
                         aria-label="Open menu"
                     >
@@ -115,7 +115,7 @@ export default function LandingNav() {
                         <span className="text-sm font-bold text-foreground">Spendstack</span>
                     </Link>
                     <button
-                        className="p-1.5 rounded-md text-muted-foreground hover:text-foreground hover:bg-white/5 transition"
+                        className="p-1.5 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted transition"
                         onClick={() => setOpen(false)}
                         aria-label="Close menu"
                     >
@@ -130,7 +130,7 @@ export default function LandingNav() {
                             key={l.label}
                             href={l.href}
                             onClick={() => setOpen(false)}
-                            className="flex items-center px-3 py-2.5 rounded-lg text-sm text-muted-foreground hover:text-foreground hover:bg-white/5 transition-colors"
+                            className="flex items-center px-3 py-2.5 rounded-lg text-sm text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
                         >
                             {l.label}
                         </a>

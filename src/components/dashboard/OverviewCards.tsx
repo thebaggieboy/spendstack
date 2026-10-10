@@ -10,7 +10,7 @@ export default function OverviewCards() {
     const { data, error, isLoading } = useSWR(`${process.env.NEXT_PUBLIC_API_URL}dashboard/overview/`, fetcher)
 
     if (isLoading) {
-        return <div className="animate-pulse h-32 bg-white/5 rounded-xl w-full"></div>
+        return <div className="animate-pulse h-32 bg-muted rounded-2xl w-full"></div>
     }
 
     if (error || !data) {
@@ -84,16 +84,16 @@ export default function OverviewCards() {
                             <p className="text-sm font-medium text-muted-foreground whitespace-nowrap">
                                 {stat.title}
                             </p>
-                            <div className={`p-2 rounded-lg bg-white/5 border border-white/10 ${stat.iconColor}`}>
+                            <div className={`p-2.5 rounded-xl bg-muted border border-border ${stat.iconColor}`}>
                                 <stat.icon className="h-4 w-4" />
                             </div>
                         </div>
                         <div className="flex items-baseline space-x-2">
-                            <h2 className="text-2xl lg:text-3xl font-bold tracking-tight text-white truncate max-w-[200px]">
+                            <h2 className="text-2xl lg:text-3xl font-semibold tracking-tight text-foreground truncate max-w-[200px]">
                                 {stat.value}
                             </h2>
                         </div>
-                        <p className={`text-xs mt-2 flex items-center ${stat.trend === 'up' ? 'text-emerald-400' : stat.trend === 'down' ? 'text-rose-400' : 'text-slate-400'}`}>
+                        <p className={`text-xs mt-2 flex items-center ${stat.trend === 'up' ? 'text-emerald-700' : stat.trend === 'down' ? 'text-rose-700' : 'text-muted-foreground'}`}>
                             <span className="font-medium mr-1 truncate">{stat.change}</span>
                         </p>
                     </CardContent>

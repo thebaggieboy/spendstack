@@ -47,7 +47,7 @@ function InsightCard({
             <CardContent className="p-5 flex flex-col gap-3">
                 <div className="flex items-center justify-between">
                     <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">{label}</p>
-                    <div className="p-1.5 rounded-md bg-white/5 border border-white/10">
+                    <div className="p-1.5 rounded-md bg-muted border border-border">
                         <Icon className={`h-3.5 w-3.5 ${accent}`} />
                     </div>
                 </div>
@@ -68,7 +68,7 @@ export default function SpendingInsights() {
         return (
             <div className="grid gap-4 grid-cols-2 md:grid-cols-4 lg:grid-cols-4">
                 {Array.from({ length: 8 }).map((_, i) => (
-                    <Card key={i} className="h-[110px] animate-pulse bg-white/5 border border-white/10" />
+                    <Card key={i} className="h-[110px] animate-pulse bg-muted" />
                 ))}
             </div>
         )
@@ -83,7 +83,7 @@ export default function SpendingInsights() {
                 </div>
                 <div className="grid gap-4 grid-cols-2 md:grid-cols-4">
                     {Array.from({ length: 8 }).map((_, i) => (
-                        <Card key={i} className="border border-dashed border-white/10 h-[110px] flex flex-col items-center justify-center gap-2">
+                        <Card key={i} className="border-dashed h-[110px] flex flex-col items-center justify-center gap-2">
                             <CardContent className="p-5 flex flex-col items-center justify-center gap-2 text-center">
                                 <Activity className="h-4 w-4 text-muted-foreground/40" />
                                 <p className="text-xs text-muted-foreground/50">Upload a statement</p>

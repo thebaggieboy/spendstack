@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { Inter } from 'next/font/google';
+import { Poppins } from 'next/font/google';
 import './globals.css';
 import { cn } from '@/lib/utils';
 import Header from '@/components/layout/Header';
@@ -7,7 +7,11 @@ import { AuthProvider } from '@/contexts/AuthContext';
 import { SidebarProvider } from '@/contexts/SidebarContext';
 import NavSwitcher from '@/components/layout/NavSwitcher';
 
-const inter = Inter({ subsets: ['latin'], variable: '--font-sans' });
+const poppins = Poppins({
+  subsets: ['latin'],
+  weight: ['400', '500', '600', '700'],
+  variable: '--font-sans',
+});
 
 export const metadata: Metadata = {
   title: 'Spendstack — AI-Powered Finance Tracker',
@@ -20,8 +24,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="dark">
-      <body className={cn('min-h-screen bg-background font-sans antialiased flex', inter.variable)}>
+    <html lang="en">
+      <body className={cn('min-h-screen bg-background font-sans antialiased flex', poppins.variable)}>
         <AuthProvider>
           <SidebarProvider>
             {/* Landing page gets its own nav; dashboard gets the sidebar */}

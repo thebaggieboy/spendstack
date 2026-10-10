@@ -21,7 +21,7 @@ export default function ExpenseChart() {
     const cardBase = "col-span-1 lg:col-span-4"
 
     if (isLoading) {
-        return <Card className={`${cardBase} h-[400px] animate-pulse bg-white/5 border border-white/10`} />
+        return <Card className={`${cardBase} h-[400px] animate-pulse bg-muted`} />
     }
 
     if (error) {
@@ -35,8 +35,8 @@ export default function ExpenseChart() {
     // Empty state — no mock data; prompt user to upload statements
     if (!rawData || rawData.length === 0) {
         return (
-            <Card className={`${cardBase} h-[400px] flex flex-col items-center justify-center gap-4 border border-dashed border-white/10`}>
-                <div className="p-4 rounded-full bg-white/5 border border-white/10">
+            <Card className={`${cardBase} h-[400px] flex flex-col items-center justify-center gap-4 border-dashed`}>
+                <div className="p-4 rounded-full bg-muted border border-border">
                     <UploadCloud className="h-8 w-8 text-muted-foreground" />
                 </div>
                 <div className="text-center space-y-1">
@@ -90,12 +90,12 @@ export default function ExpenseChart() {
                             <Tooltip
                                 formatter={(value: any) => [formatNairaTooltip(value as number), undefined]}
                                 contentStyle={{
-                                    backgroundColor: 'rgba(10, 10, 10, 0.85)',
-                                    border: '1px solid rgba(255,255,255,0.08)',
+                                    backgroundColor: '#ffffff',
+                                    border: '1px solid hsl(240 6% 90%)',
                                     borderRadius: '10px',
                                     backdropFilter: 'blur(12px)',
-                                    color: 'white',
-                                    boxShadow: '0 10px 25px -5px rgba(0,0,0,0.5)'
+                                    color: '#18181b',
+                                    boxShadow: '0 10px 25px -5px rgba(24,24,27,0.12)'
                                 }}
                             />
                             <Area
