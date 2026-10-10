@@ -77,8 +77,7 @@ export default function OverviewCards() {
     return (
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             {stats.map((stat) => (
-                <Card key={stat.title} className="relative overflow-hidden group">
-                    <div className={`absolute top-0 left-0 w-1 h-full bg-gradient-to-b ${stat.color} opacity-50 group-hover:opacity-100 transition-opacity`} />
+                <Card key={stat.title} className="group">
                     <CardContent className="p-6">
                         <div className="flex justify-between items-start mb-4">
                             <p className="text-sm font-medium text-muted-foreground whitespace-nowrap">

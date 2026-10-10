@@ -19,8 +19,8 @@ import Link from "next/link"
 const CustomTooltip = ({ active, payload, label }: any) => {
     if (active && payload && payload.length) {
         return (
-            <div className="bg-[#1a1a2e] border border-white/20 rounded-xl p-3 text-sm shadow-xl">
-                <p className="font-semibold text-white mb-1">{label}</p>
+            <div className="bg-white border border-border rounded-xl p-3 text-sm shadow-lg">
+                <p className="font-semibold text-foreground mb-1">{label}</p>
                 {payload.map((p: any, i: number) => (
                     <p key={i} style={{ color: p.color || p.stroke }}>{p.name}: {formatNaira(Math.abs(p.value))}</p>
                 ))}
@@ -52,7 +52,7 @@ export default function StatementDetailPage() {
         return (
             <div className="flex flex-col items-center justify-center min-h-[60vh] text-center space-y-4">
                 <FileText className="h-12 w-12 text-muted-foreground opacity-30" />
-                <h2 className="text-xl font-semibold text-white">Statement not found</h2>
+                <h2 className="text-xl font-semibold text-foreground">Statement not found</h2>
                 <Link href="/dashboard/statements" className="text-primary hover:underline text-sm">
                     ← Back to Statements
                 </Link>
@@ -86,21 +86,21 @@ export default function StatementDetailPage() {
             <div className="flex items-start gap-4">
                 <button
                     onClick={() => router.push("/dashboard/statements")}
-                    className="p-2 rounded-xl bg-white/5 border border-white/10 text-muted-foreground hover:text-white hover:bg-white/10 transition-all mt-1"
+                    className="p-2 rounded-xl bg-white border border-border text-muted-foreground hover:text-foreground hover:bg-muted transition-all mt-1"
                 >
                     <ArrowLeft className="h-4 w-4" />
                 </button>
                 <div className="flex-1">
                     <div className="flex flex-wrap items-center gap-3">
-                        <div className="p-3 bg-indigo-500/10 rounded-xl">
-                            <FileText className="h-6 w-6 text-indigo-400" />
+                        <div className="p-3 bg-indigo-50 rounded-xl">
+                            <FileText className="h-6 w-6 text-indigo-700" />
                         </div>
                         <div>
-                            <h1 className="text-2xl font-bold tracking-tight text-white truncate max-w-md">{filename}</h1>
+                            <h1 className="text-2xl font-bold tracking-tight text-foreground truncate max-w-md">{filename}</h1>
                             <div className="flex items-center gap-2 mt-1 text-sm text-muted-foreground">
                                 <Calendar className="h-3.5 w-3.5" />
                                 <span>Uploaded {upload_date}</span>
-                                <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-emerald-400/10 text-emerald-400 border border-emerald-400/20">
+                                <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-emerald-50 text-emerald-700 border border-emerald-200">
                                     {stats.transaction_count} transactions
                                 </span>
                             </div>
@@ -112,15 +112,14 @@ export default function StatementDetailPage() {
             {/* Summary Cards */}
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
                 {statCards.map((c) => (
-                    <Card key={c.label} className="relative overflow-hidden">
-                        <div className="absolute top-0 left-0 w-1 h-full" style={{ backgroundColor: c.colorHex, opacity: 0.7 }} />
+                    <Card key={c.label}>
                         <CardContent className="p-4 pl-5">
                             <div className="flex justify-between items-start mb-2">
                                 <p className="text-xs text-muted-foreground">{c.label}</p>
                                 <c.icon className="h-4 w-4" style={{ color: c.colorHex }} />
                             </div>
-                            <p className="text-xl font-bold text-white">{c.value}</p>
-                            {c.sub && <p className={`text-xs mt-0.5 text-${c.color}-400`}>{c.sub}</p>}
+                            <p className="text-xl font-bold text-foreground">{c.value}</p>
+                            {c.sub && <p className="text-xs mt-0.5" style={{ color: c.colorHex }}>{c.sub}</p>}
                         </CardContent>
                     </Card>
                 ))}
@@ -143,7 +142,7 @@ export default function StatementDetailPage() {
                                         <stop offset="95%" stopColor="#6366f1" stopOpacity={0} />
                                     </linearGradient>
                                 </defs>
-                                <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
+                                <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
                                 <XAxis dataKey="date" tick={{ fontSize: 10, fill: "#71717a" }} interval="preserveStartEnd" />
                                 <YAxis tickFormatter={v => formatNaira(v)} tick={{ fontSize: 10, fill: "#71717a" }} />
                                 <Tooltip content={<CustomTooltip />} />
@@ -174,7 +173,7 @@ export default function StatementDetailPage() {
                                     </Pie>
                                     <Tooltip
                                         formatter={(v: any) => formatNaira(v)}
-                                        contentStyle={{ background: "#1a1a2e", border: "1px solid rgba(255,255,255,0.15)", borderRadius: "12px", fontSize: "12px" }}
+                                        contentStyle={{ background: "#ffffff", color: "#18181b", border: "1px solid #e4e4e7", borderRadius: "12px", fontSize: "12px" }}
                                     />
                                     <Legend iconType="circle" iconSize={8} wrapperStyle={{ fontSize: "11px" }} />
                                 </PieChart>
@@ -195,7 +194,7 @@ export default function StatementDetailPage() {
                 <CardContent>
                     <ResponsiveContainer width="100%" height={200}>
                         <BarChart data={daily_data}>
-                            <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
+                            <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
                             <XAxis dataKey="date" tick={{ fontSize: 10, fill: "#71717a" }} />
                             <YAxis tickFormatter={v => formatNaira(v)} tick={{ fontSize: 10, fill: "#71717a" }} />
                             <Tooltip content={<CustomTooltip />} />
@@ -221,7 +220,7 @@ export default function StatementDetailPage() {
                                 value={search}
                                 onChange={e => setSearch(e.target.value)}
                                 placeholder="Search transactions..."
-                                className="w-full bg-white/5 border border-white/10 rounded-xl py-2 pl-9 pr-3 text-sm text-white focus:outline-none focus:ring-1 focus:ring-primary/50"
+                                className="w-full bg-white border border-input rounded-xl py-2 pl-9 pr-3 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary/50"
                             />
                         </div>
                     </div>
@@ -230,7 +229,7 @@ export default function StatementDetailPage() {
                     <div className="overflow-x-auto">
                         <div className="min-w-[640px]">
                             {/* Table Header */}
-                            <div className="grid grid-cols-12 gap-3 px-4 py-2 text-xs font-medium text-zinc-500 uppercase tracking-wider border-b border-white/10">
+                            <div className="grid grid-cols-12 gap-3 px-4 py-2 text-xs font-medium text-muted-foreground uppercase tracking-wider border-b border-border">
                                 <div className="col-span-5">Description</div>
                                 <div className="col-span-2">Category</div>
                                 <div className="col-span-2 text-right">Date</div>
@@ -238,34 +237,34 @@ export default function StatementDetailPage() {
                                 <div className="col-span-1 text-right">Balance</div>
                             </div>
 
-                            <div className="divide-y divide-white/5">
+                            <div className="divide-y divide-border">
                                 {filteredTx.length === 0 ? (
                                     <div className="text-center text-sm text-muted-foreground py-10">No results found</div>
                                 ) : (
                                     filteredTx.map((tx: any) => (
-                                        <div key={tx.id} className="grid grid-cols-12 gap-3 items-center px-4 py-3 hover:bg-white/5 transition-colors rounded-xl group">
+                                        <div key={tx.id} className="grid grid-cols-12 gap-3 items-center px-4 py-3 hover:bg-muted/50 transition-colors rounded-xl group">
                                             <div className="col-span-5 flex items-center gap-3 min-w-0">
-                                                <div className={`p-2 rounded-lg flex-shrink-0 ${tx.amount > 0 ? "bg-emerald-500/10" : "bg-rose-500/10"}`}>
+                                                <div className={`p-2 rounded-lg flex-shrink-0 ${tx.amount > 0 ? "bg-emerald-50" : "bg-rose-50"}`}>
                                                     {tx.amount > 0
-                                                        ? <ArrowDownRight className="h-4 w-4 text-emerald-400" />
-                                                        : <ArrowUpRight className="h-4 w-4 text-rose-400" />
+                                                        ? <ArrowDownRight className="h-4 w-4 text-emerald-700" />
+                                                        : <ArrowUpRight className="h-4 w-4 text-rose-700" />
                                                     }
                                                 </div>
                                                 <div className="min-w-0">
-                                                    <p className="text-sm font-medium text-white truncate">{tx.merchant_name}</p>
-                                                    <p className="text-xs text-zinc-500 truncate">{tx.raw_description}</p>
+                                                    <p className="text-sm font-medium text-foreground truncate">{tx.merchant_name}</p>
+                                                    <p className="text-xs text-muted-foreground truncate">{tx.raw_description}</p>
                                                 </div>
                                             </div>
                                             <div className="col-span-2">
                                                 <span
-                                                    className="inline-flex items-center px-2 py-0.5 rounded-md text-xs border border-white/10 text-zinc-400 truncate max-w-full"
+                                                    className="inline-flex items-center px-2 py-0.5 rounded-md text-xs border border-border text-muted-foreground truncate max-w-full"
                                                     style={{ borderColor: tx.category_color + "40", color: tx.category_color }}
                                                 >
                                                     {tx.category}
                                                 </span>
                                             </div>
                                             <div className="col-span-2 text-right text-xs text-muted-foreground">{tx.date}</div>
-                                            <div className={`col-span-2 text-right text-sm font-bold ${tx.amount > 0 ? "text-emerald-400" : "text-white"}`}>
+                                            <div className={`col-span-2 text-right text-sm font-bold ${tx.amount > 0 ? "text-emerald-700" : "text-foreground"}`}>
                                                 {tx.amount > 0 ? "+" : ""}{formatNaira(Math.abs(tx.amount))}
                                             </div>
                                             <div className="col-span-1 text-right text-xs text-muted-foreground font-mono">

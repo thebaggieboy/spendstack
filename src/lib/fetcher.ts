@@ -19,24 +19,28 @@ async function attemptTokenRefresh(): Promise<string | null> {
             localStorage.setItem("accessToken", newAccess);
             return newAccess;
         }
-    } catch (_) {
+    } catch {
         // ignore network errors during refresh
     }
 
     return null;
 }
 
-export const fetchWithAuth = async (url: string): Promise<any> => {
-    let token = localStorage.getItem("accessToken");
+export const requestWithAuth = async <T = unknown>(
+    url: string,
+    init: RequestInit = {},
+): Promise<T> => {
+    const token = localStorage.getItem("accessToken");
 
     const makeRequest = async (tkn: string | null) => {
-        const headers: HeadersInit = {
-            "Content-Type": "application/json",
-        };
-        if (tkn) {
-            headers["Authorization"] = `Bearer ${tkn}`;
+        const headers = new Headers(init.headers);
+        if (init.body && !(init.body instanceof FormData)) {
+            headers.set("Content-Type", "application/json");
         }
-        return fetch(url, { headers });
+        if (tkn) {
+            headers.set("Authorization", `Bearer ${tkn}`);
+        }
+        return fetch(url, { ...init, headers });
     };
 
     let res = await makeRequest(token);
@@ -60,13 +64,24 @@ export const fetchWithAuth = async (url: string): Promise<any> => {
     }
 
     if (!res.ok) {
-        const error = new Error("An error occurred while fetching the data.");
-        // @ts-ignore
-        error.info = await res.json().catch(() => ({}));
-        // @ts-ignore
-        error.status = res.status;
+        const errorInfo: unknown = await res.json().catch(() => ({}));
+        const errorMessage =
+            typeof errorInfo === "object" &&
+            errorInfo !== null &&
+            "detail" in errorInfo &&
+            typeof errorInfo.detail === "string"
+                ? errorInfo.detail
+                : "An error occurred while fetching the data.";
+        const error = new Error(errorMessage);
+        Object.assign(error, { info: errorInfo, status: res.status });
         throw error;
     }
 
-    return res.json();
+    if (res.status === 204) return undefined as T;
+    return res.json() as Promise<T>;
 };
+
+type LegacyJsonResponse = ReturnType<typeof JSON.parse>
+
+export const fetchWithAuth = (url: string): Promise<LegacyJsonResponse> =>
+    requestWithAuth<LegacyJsonResponse>(url);

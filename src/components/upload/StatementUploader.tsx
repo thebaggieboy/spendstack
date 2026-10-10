@@ -99,7 +99,7 @@ export default function StatementUploader() {
             </CardHeader>
             <CardContent>
                 <div
-                    className={`border-2 border-dashed rounded-xl p-10 flex flex-col items-center justify-center transition-all duration-300 ${isHovering ? "border-primary bg-primary/5 scale-[1.02]" : "border-white/10 hover:border-white/20 hover:bg-white/5"} ${!file && !isProcessing ? "cursor-pointer" : ""}`}
+                    className={`border-2 border-dashed rounded-xl p-10 flex flex-col items-center justify-center transition-all duration-300 ${isHovering ? "border-primary bg-primary/5 scale-[1.02]" : "border-border hover:border-primary/30 hover:bg-muted/40"} ${!file && !isProcessing ? "cursor-pointer" : ""}`}
                     onDragOver={(e) => { e.preventDefault(); setIsHovering(true); }}
                     onDragLeave={() => setIsHovering(false)}
                     onDrop={handleDrop}
@@ -119,7 +119,7 @@ export default function StatementUploader() {
                     />
 
                     {error && (
-                        <div className="mb-6 p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 absolute top-4 left-4 right-4 flex items-center gap-3">
+                        <div className="mb-6 p-4 rounded-xl bg-red-50 border border-red-200 text-red-700 absolute top-4 left-4 right-4 flex items-center gap-3">
                             <AlertCircle className="h-5 w-5" />
                             <p className="text-sm">{error}</p>
                         </div>
@@ -132,17 +132,17 @@ export default function StatementUploader() {
                                 <Sparkles className="h-5 w-5 text-amber-400 absolute -top-1 -right-1 animate-pulse" />
                             </div>
                             <div className="text-center">
-                                <p className="text-lg font-medium text-white mb-1">AI Agent Running...</p>
+                                <p className="text-lg font-medium text-foreground mb-1">AI Agent Running...</p>
                                 <p className="text-sm text-muted-foreground">Categorizing your transactions intelligently</p>
                             </div>
                         </div>
                     ) : file ? (
                         <div className="flex flex-col items-center space-y-4">
-                            <div className="h-16 w-16 rounded-2xl bg-gradient-to-br from-blue-500/20 to-purple-500/20 border border-white/10 flex items-center justify-center">
-                                <FileText className="h-8 w-8 text-blue-400" />
+                            <div className="h-16 w-16 rounded-2xl bg-blue-50 border border-blue-100 flex items-center justify-center">
+                                <FileText className="h-8 w-8 text-blue-700" />
                             </div>
                             <div className="text-center">
-                                <p className="text-lg font-medium text-white mb-1">{file.name}</p>
+                                <p className="text-lg font-medium text-foreground mb-1">{file.name}</p>
                                 <p className="text-sm text-muted-foreground">Ready for AI analysis</p>
                             </div>
                             <div className="flex gap-3 mt-4">
@@ -157,11 +157,11 @@ export default function StatementUploader() {
                         </div>
                     ) : (
                         <div className="flex flex-col items-center space-y-4 pointer-events-none">
-                            <div className="h-16 w-16 rounded-full bg-white/5 flex items-center justify-center">
+                            <div className="h-16 w-16 rounded-full bg-muted flex items-center justify-center">
                                 <Upload className="h-8 w-8 text-muted-foreground" />
                             </div>
                             <div className="text-center">
-                                <p className="text-lg font-medium text-white mb-1">Click or drag file to this area</p>
+                                <p className="text-lg font-medium text-foreground mb-1">Click or drag file to this area</p>
                                 <p className="text-sm text-muted-foreground">Supports CSV, PDF up to 10MB</p>
                             </div>
                         </div>

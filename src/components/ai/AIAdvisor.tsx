@@ -42,12 +42,10 @@ export default function AIAdvisor() {
                 {insights.map((insight: any, i: number) => {
                     const isAlert = insight.type === 'alert'
                     const Icon = isAlert ? AlertTriangle : CheckCircle2
-                    const accentClass = isAlert ? 'bg-amber-500' : 'bg-emerald-600'
                     const iconClass = isAlert ? 'text-amber-600' : 'text-emerald-700'
 
                     return (
-                        <div key={i} className="p-4 rounded-xl bg-white border border-border relative group overflow-hidden">
-                            <div className={`absolute left-0 top-0 w-1 h-full ${accentClass}`} />
+                        <div key={i} className="p-4 rounded-xl bg-white border border-border">
                             <div className="flex gap-4 relative z-10">
                                 <div className="mt-0.5">
                                     <Icon className={`h-5 w-5 ${iconClass}`} />

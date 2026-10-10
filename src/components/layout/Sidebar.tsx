@@ -7,7 +7,6 @@ import { useSidebar } from "@/contexts/SidebarContext"
 import {
     LayoutDashboard,
     PieChart,
-    Wallet,
     ArrowRightLeft,
     Settings,
     BrainCircuit,
@@ -16,6 +15,8 @@ import {
     Receipt,
     BarChart3,
     X,
+    CalendarClock,
+    MessageCircle,
 } from "lucide-react"
 
 const routes = [
@@ -23,6 +24,8 @@ const routes = [
     { label: "Upload Statement", icon: Upload,           href: "/upload",                color: "text-emerald-500" },
     { label: "Statements",       icon: FileText,         href: "/dashboard/statements",  color: "text-indigo-400" },
     { label: "Transactions",     icon: ArrowRightLeft,   href: "/dashboard/transactions",color: "text-blue-500" },
+    { label: "Statement Chat",  icon: MessageCircle,   href: "/dashboard/chat",         color: "text-primary" },
+    { label: "Money Tools",      icon: CalendarClock,    href: "/dashboard/money-tools", color: "text-amber-500" },
     { label: "Analytics",        icon: PieChart,         href: "/dashboard/analytics",   color: "text-purple-500" },
     { label: "Tax Calculator",   icon: Receipt,          href: "/dashboard/tax",         color: "text-green-400" },
    // { label: "Budgets",          icon: Wallet,           href: "/dashboard/budgets",     color: "text-pink-500" },

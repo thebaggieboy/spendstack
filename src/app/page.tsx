@@ -14,6 +14,10 @@ import {
     Upload,
     Zap,
     PieChart,
+    CalendarClock,
+    BellRing,
+    Tags,
+    ArrowRightLeft,
 } from "lucide-react"
 
 export default function LandingPage() {
@@ -323,7 +327,12 @@ export default function LandingPage() {
 
             {/* ─── Feature Grid ─────────────────────────────────────────── */}
             <section className="w-full border-t border-border py-20">
-                <div className="max-w-5xl mx-auto px-6 grid grid-cols-1 md:grid-cols-3 gap-10">
+                <div className="max-w-6xl mx-auto px-6">
+                    <div className="max-w-xl mb-12">
+                        <p className="text-xs font-semibold uppercase tracking-widest text-primary mb-3">More control, less busywork</p>
+                        <h2 className="text-3xl md:text-4xl font-semibold tracking-tight text-foreground">The details that make money easier</h2>
+                    </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                     {[
                         {
                             icon: BarChart3,
@@ -355,15 +364,36 @@ export default function LandingPage() {
                             title: "Cash Flow Tracking",
                             desc: "Visualize income vs. expense streams over any date range to spot patterns and plan ahead.",
                         },
+                        {
+                            icon: CalendarClock,
+                            title: "Recurring Bill Detection",
+                            desc: "Spot subscriptions and repeat payments in your statement history before they catch you by surprise.",
+                        },
+                        {
+                            icon: BellRing,
+                            title: "Spending Alerts",
+                            desc: "Set spending thresholds for categories or your overall budget and get a heads-up as you approach them.",
+                        },
+                        {
+                            icon: Tags,
+                            title: "Custom Merchant & Category Rules",
+                            desc: "Create rules to consistently rename merchants and categorize transactions the way that works for you.",
+                        },
+                        {
+                            icon: ArrowRightLeft,
+                            title: "Transfer Detection",
+                            desc: "Use transaction descriptions to recognize transfers, so moving money is not mistaken for income or spending.",
+                        },
                     ].map((feat) => (
-                        <div key={feat.title} className="space-y-3">
-                            <div className="h-9 w-9 rounded-lg bg-muted border border-border flex items-center justify-center">
-                                <feat.icon className="h-4 w-4 text-foreground" />
+                        <div key={feat.title} className="rounded-2xl border border-border bg-white p-5 transition hover:-translate-y-0.5 hover:shadow-md">
+                            <div className="h-10 w-10 rounded-xl bg-primary/5 border border-primary/10 flex items-center justify-center">
+                                <feat.icon className="h-4 w-4 text-primary" />
                             </div>
-                            <h3 className="text-sm font-semibold text-foreground">{feat.title}</h3>
-                            <p className="text-sm text-muted-foreground leading-relaxed">{feat.desc}</p>
+                            <h3 className="mt-5 text-sm font-semibold text-foreground">{feat.title}</h3>
+                            <p className="mt-2 text-sm text-muted-foreground leading-relaxed">{feat.desc}</p>
                         </div>
                     ))}
+                    </div>
                 </div>
             </section>
 

@@ -10,11 +10,11 @@ export default function AnalyticsPage() {
         <div className="space-y-6">
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                 <div>
-                    <h1 className="text-3xl font-bold tracking-tight text-white">Analytics</h1>
+                    <h1 className="text-3xl font-bold tracking-tight text-foreground">Analytics</h1>
                     <p className="text-muted-foreground mt-1">Deep dive into your spending habits.</p>
                 </div>
                 <div className="flex items-center gap-2 w-full sm:w-auto">
-                    <button className="flex items-center gap-2 px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-sm font-medium hover:bg-white/10 transition text-white">
+                    <button className="flex items-center gap-2 px-4 py-2 bg-white border border-border rounded-lg text-sm font-medium hover:bg-muted transition text-foreground">
                         <Download className="h-4 w-4" />
                         Export Report
                     </button>
@@ -40,7 +40,7 @@ export default function AnalyticsPage() {
                         </CardTitle>
                         <CardDescription>How this month compares to last month</CardDescription>
                     </CardHeader>
-                    <CardContent className="h-[300px] flex items-center justify-center text-muted-foreground border border-dashed border-white/10 rounded-xl m-4 mt-0 bg-white/5">
+                    <CardContent className="h-[300px] flex items-center justify-center text-muted-foreground border border-dashed border-border rounded-xl m-4 mt-0 bg-muted/40">
                         <p>More detailed charts coming soon...</p>
                     </CardContent>
                 </Card>

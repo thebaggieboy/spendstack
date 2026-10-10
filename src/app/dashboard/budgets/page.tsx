@@ -8,7 +8,7 @@ export default function BudgetsPage() {
         <div className="space-y-6">
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                 <div>
-                    <h1 className="text-3xl font-bold tracking-tight text-white">Budgets</h1>
+                    <h1 className="text-3xl font-bold tracking-tight text-foreground">Budgets</h1>
                     <p className="text-muted-foreground mt-1">Set limits and track your spending goals.</p>
                 </div>
                 <div className="flex items-center gap-2 w-full sm:w-auto">
@@ -33,14 +33,14 @@ export default function BudgetsPage() {
                     <CardContent>
                         <div className="flex justify-between items-end mb-2">
                             <div>
-                                <p className="text-3xl font-bold text-white">₦450,000</p>
+                                <p className="text-3xl font-bold text-foreground">₦450,000</p>
                                 <p className="text-sm text-muted-foreground">spent of ₦600,000 budget</p>
                             </div>
                             <div className="text-right">
                                 <p className="text-sm font-medium text-emerald-400">75%</p>
                             </div>
                         </div>
-                        <div className="w-full h-3 bg-white/10 rounded-full mt-4 overflow-hidden">
+                        <div className="w-full h-3 bg-muted rounded-full mt-4 overflow-hidden">
                             <div
                                 className="h-full bg-gradient-to-r from-emerald-400 to-emerald-500 rounded-full"
                                 style={{ width: '75%' }}
@@ -75,14 +75,14 @@ export default function BudgetsPage() {
                             <CardContent>
                                 <div className="space-y-2">
                                     <div className="flex justify-between text-sm">
-                                        <span className={`font-bold text-${isOver ? 'rose-400' : 'white'}`}>
+                                        <span className={`font-bold ${isOver ? 'text-rose-700' : 'text-foreground'}`}>
                                             ₦{budget.spent.toLocaleString()}
                                         </span>
                                         <span className="text-muted-foreground">
                                             of ₦{budget.limit.toLocaleString()}
                                         </span>
                                     </div>
-                                    <div className="w-full h-2 bg-white/5 rounded-full overflow-hidden">
+                                    <div className="w-full h-2 bg-muted rounded-full overflow-hidden">
                                         <div
                                             className={`h-full rounded-full ${isOver ? 'bg-rose-500' : percentage > 85 ? 'bg-amber-500' : 'bg-emerald-500'}`}
                                             style={{ width: `${percentage}%` }}
@@ -90,7 +90,7 @@ export default function BudgetsPage() {
                                     </div>
                                     <p className="text-xs text-muted-foreground text-right mt-1">
                                         {isOver ? (
-                                            <span className="text-rose-400">₦{(budget.spent - budget.limit).toLocaleString()} over limit</span>
+                                            <span className="text-rose-700">₦{(budget.spent - budget.limit).toLocaleString()} over limit</span>
                                         ) : (
                                             <span>₦{(budget.limit - budget.spent).toLocaleString()} left</span>
                                         )}
