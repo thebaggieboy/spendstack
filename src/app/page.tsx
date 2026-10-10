@@ -18,10 +18,10 @@ import {
 
 export default function LandingPage() {
     return (
-        <div className="flex-1 flex flex-col items-center min-h-[80vh] font-sans pt-16">
+        <div className="flex-1 flex flex-col items-center min-h-[80vh] font-sans">
 
             {/* ─── Hero ─────────────────────────────────────────────────── */}
-            <section className="w-full max-w-6xl mx-auto px-6 pt-20 pb-20 lg:pt-24 lg:pb-28">
+            <section className="w-full max-w-6xl mx-auto px-6 pt-16 pb-20 lg:pt-20 lg:pb-28">
                 <div className="grid items-center gap-14 lg:grid-cols-[1.05fr_0.95fr] lg:gap-16">
                     <div>
                         <div className="inline-flex items-center gap-2 rounded-full border border-primary/15 bg-primary/5 px-3.5 py-2 text-xs font-medium text-primary mb-7">
