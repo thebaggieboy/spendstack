@@ -27,7 +27,7 @@ const tools: {
 }[] = [
     {
         title: "Lock money",
-        description: "Set funds aside for a chosen period and schedule a verified bank payout for maturity.",
+        description: "Set funds aside for a chosen period and schedule a verified bank payout for maturity. ",
         href: "/dashboard/lock-money",
         icon: LockKeyhole,
         accent: "bg-violet-50 text-violet-700",
@@ -49,46 +49,8 @@ const tools: {
         accent: "bg-emerald-50 text-emerald-700",
         label: "Planning",
     },
-    {
-        title: "Recurring bills",
-        description: "Spot repeating payments and see when the next one is expected.",
-        href: "/dashboard/money-tools#recurring-bills",
-        icon: CalendarClock,
-        accent: "bg-amber-50 text-amber-700",
-        label: "Automation",
-    },
-    {
-        title: "Spending alerts",
-        description: "Set weekly or monthly thresholds and get in-app warnings.",
-        href: "/dashboard/money-tools#spending-alerts",
-        icon: BellRing,
-        accent: "bg-rose-50 text-rose-700",
-        label: "Alerts",
-    },
-    {
-        title: "Merchant & category rules",
-        description: "Automatically rename, categorize, or identify transactions from their description.",
-        href: "/dashboard/money-tools#transaction-rules",
-        icon: Tags,
-        accent: "bg-cyan-50 text-cyan-700",
-        label: "Automation",
-    },
-    {
-        title: "Chat with statements",
-        description: "Ask questions about your transactions and get answers with source links.",
-        href: "/dashboard/chat",
-        icon: MessageCircle,
-        accent: "bg-indigo-50 text-indigo-700",
-        label: "AI",
-    },
-    {
-        title: "Analytics",
-        description: "Compare spending and income across equivalent periods.",
-        href: "/dashboard/analytics",
-        icon: ChartNoAxesCombined,
-        accent: "bg-sky-50 text-sky-700",
-        label: "Insights",
-    },
+ 
+ 
     {
         title: "Tax calculator",
         description: "Explore an estimate from your income and eligible deductions.",
@@ -97,22 +59,7 @@ const tools: {
         accent: "bg-orange-50 text-orange-700",
         label: "Planning",
     },
-    {
-        title: "Statements",
-        description: "Browse imported statements and inspect source transactions.",
-        href: "/dashboard/statements",
-        icon: FileText,
-        accent: "bg-slate-100 text-slate-700",
-        label: "Records",
-    },
-    {
-        title: "Transactions",
-        description: "Search and review categorized transaction activity.",
-        href: "/dashboard/transactions",
-        icon: ArrowRightLeft,
-        accent: "bg-purple-50 text-purple-700",
-        label: "Records",
-    },
+ 
     {
         title: "AI advisor",
         description: "Review personalized insights from your recorded financial activity.",

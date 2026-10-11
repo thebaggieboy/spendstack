@@ -1,0 +1,22 @@
+{
+  "inputs": [
+    {
+      "id": "spendstackApiToken",
+      "type": "promptString",
+      "description": "Spendstack API access token",
+      "password": true
+    }
+  ],
+  "servers": {
+    "spendstack": {
+      "type": "stdio",
+      "command": "C:\\Users\\newsh\\OneDrive\\Documents\\Spendstack\\backend\\mcp_server\\.venv\\Scripts\\python.exe",
+      "args": ["-m", "spendstack_mcp.server"],
+      "cwd": "C:\\Users\\newsh\\OneDrive\\Documents\\Spendstack\\backend\\mcp_server",
+      "env": {
+        "SPENDSTACK_API_URL": "https://spendstack-backend.onrender.com",
+        "SPENDSTACK_API_TOKEN": "${input:spendstackApiToken}"
+      }
+    }
+  }
+}

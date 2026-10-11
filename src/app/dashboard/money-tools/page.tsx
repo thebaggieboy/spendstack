@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import useSWR from "swr"
+import Link from "next/link"
 import {
     ArrowLeftRight,
     BellRing,
@@ -19,6 +20,11 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL
 const recurringUrl = `${API_URL}dashboard/recurring-bills/`
 const alertsUrl = `${API_URL}transactions/alerts/`
 const rulesUrl = `${API_URL}transactions/rules/`
+const subscriptionUrl = `${API_URL}billing/subscription/`
+
+interface Subscription {
+    is_pro: boolean
+}
 
 interface RecurringBill {
     merchant: string
@@ -62,8 +68,9 @@ function displayDate(value: string) {
 }
 
 export default function MoneyToolsPage() {
+    const { data: subscription } = useSWR<Subscription>(subscriptionUrl, fetchWithAuth)
     const { data: bills, error: billsError, isLoading: billsLoading, mutate: refreshBills } =
-        useSWR<RecurringBill[]>(recurringUrl, fetchWithAuth)
+        useSWR<RecurringBill[]>(subscription?.is_pro ? recurringUrl : null, fetchWithAuth)
     const { data: alerts, error: alertsError, isLoading: alertsLoading, mutate: refreshAlerts } =
         useSWR<SpendingAlert[]>(alertsUrl, fetchWithAuth)
     const { data: rules, error: rulesError, isLoading: rulesLoading, mutate: refreshRules } =
@@ -163,6 +170,17 @@ export default function MoneyToolsPage() {
                 </p>
             </header>
 
+            {subscription && !subscription.is_pro && (
+                <aside className="flex flex-col gap-3 rounded-2xl border border-primary/20 bg-primary/[0.04] p-4 sm:flex-row sm:items-center sm:justify-between">
+                    <p className="text-sm text-foreground">
+                        Recurring-bill detection and creating automated spending alerts or transaction rules are included with Pro.
+                    </p>
+                    <Link href="/dashboard/upgrade" className="shrink-0 text-sm font-semibold text-primary hover:underline">
+                        Explore Pro
+                    </Link>
+                </aside>
+            )}
+
             {actionError && (
                 <div role="alert" className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
                     {actionError}
@@ -184,7 +202,12 @@ export default function MoneyToolsPage() {
                     </div>
                 </CardHeader>
                 <CardContent>
-                    {billsLoading ? (
+                    {!subscription?.is_pro ? (
+                        <div className="rounded-xl bg-muted/60 p-4 text-sm text-muted-foreground">
+                            See upcoming recurring payments with Spendstack Pro.{" "}
+                            <Link href="/dashboard/upgrade" className="font-medium text-primary hover:underline">View plans</Link>
+                        </div>
+                    ) : billsLoading ? (
                         <p className="text-sm text-muted-foreground">Checking transaction history…</p>
                     ) : billsError ? (
                         <p role="alert" className="text-sm text-red-700">Could not load recurring payments.</p>
@@ -247,7 +270,7 @@ export default function MoneyToolsPage() {
                                     </select>
                                 </label>
                             </div>
-                            <button type="submit" disabled={isSaving} className="inline-flex h-10 items-center gap-2 rounded-xl bg-primary px-4 text-sm font-medium text-primary-foreground transition hover:bg-primary/90 disabled:opacity-60">
+                            <button type="submit" disabled={isSaving || !subscription?.is_pro} className="inline-flex h-10 items-center gap-2 rounded-xl bg-primary px-4 text-sm font-medium text-primary-foreground transition hover:bg-primary/90 disabled:opacity-60">
                                 <Plus className="h-4 w-4" /> Add alert
                             </button>
                         </form>
@@ -335,7 +358,7 @@ export default function MoneyToolsPage() {
                                     <option value="not_transfer">Never treat as a transfer</option>
                                 </select>
                             </label>
-                            <button type="submit" disabled={isSaving} className="inline-flex h-10 items-center gap-2 rounded-xl bg-primary px-4 text-sm font-medium text-primary-foreground transition hover:bg-primary/90 disabled:opacity-60">
+                            <button type="submit" disabled={isSaving || !subscription?.is_pro} className="inline-flex h-10 items-center gap-2 rounded-xl bg-primary px-4 text-sm font-medium text-primary-foreground transition hover:bg-primary/90 disabled:opacity-60">
                                 <Plus className="h-4 w-4" /> Add rule
                             </button>
                         </form>

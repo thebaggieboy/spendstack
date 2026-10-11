@@ -4,6 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { BrainCircuit, Sparkles, AlertTriangle, ArrowRight, CheckCircle2 } from "lucide-react"
 import useSWR from 'swr'
 import { fetchWithAuth as fetcher } from '@/lib/fetcher';
+import ProFeatureGate from "@/components/billing/ProFeatureGate"
 
 type Insight = {
     type: string
@@ -11,7 +12,7 @@ type Insight = {
     message: string
 }
 
-export default function AIAdvisor() {
+function AIAdvisorContent() {
     const { data: insights, error, isLoading } = useSWR<Insight[]>(`${process.env.NEXT_PUBLIC_API_URL}dashboard/advisor/`, fetcher)
 
     if (isLoading) {
@@ -78,5 +79,13 @@ export default function AIAdvisor() {
 
             </CardContent>
         </Card>
+    )
+}
+
+export default function AIAdvisor() {
+    return (
+        <ProFeatureGate feature="AI-powered financial advice">
+            <AIAdvisorContent />
+        </ProFeatureGate>
     )
 }

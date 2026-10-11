@@ -4,7 +4,7 @@ import { usePathname } from "next/navigation"
 import LandingNav from "@/components/layout/LandingNav"
 import Sidebar from "@/components/layout/Sidebar"
 
-const PUBLIC_PAGES = ["/", "/login", "/signup"]
+const PUBLIC_PAGES = ["/", "/login", "/signup", "/tax-engine", "/ai-advisor"]
 
 export default function NavSwitcher() {
     const pathname = usePathname()

@@ -8,12 +8,15 @@ interface User {
     email: string;
     first_name: string;
     last_name: string;
+    is_staff: boolean;
+    is_superuser: boolean;
 }
 
 interface AuthContextType {
     user: User | null;
     loading: boolean;
     login: (access: string, refresh: string) => Promise<void>;
+    updateUser: (user: User) => void;
     logout: () => void;
     token: string | null;
 }
@@ -22,6 +25,7 @@ const AuthContext = createContext<AuthContextType>({
     user: null,
     loading: true,
     login: async () => { },
+    updateUser: () => { },
     logout: () => { },
     token: null,
 });
@@ -91,11 +95,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         router.push("/login");
     };
 
+    const updateUser = (updatedUser: User) => setUser(updatedUser);
+
     // Protect routes - simple check
     useEffect(() => {
         if (!loading) {
             const isPublicPath = pathname === "/" || pathname === "/login" || pathname === "/signup";
-            if (!user && !isPublicPath && pathname?.startsWith("/dashboard")) {
+            const isProtectedPath = pathname?.startsWith("/dashboard") || pathname?.startsWith("/admin");
+            if (!user && !isPublicPath && isProtectedPath) {
                 router.push("/login");
             }
             if (user && (pathname === "/login" || pathname === "/signup")) {
@@ -105,7 +112,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }, [user, loading, pathname, router]);
 
     return (
-        <AuthContext.Provider value={{ user, loading, login, logout, token }}>
+        <AuthContext.Provider value={{ user, loading, login, updateUser, logout, token }}>
             {children}
         </AuthContext.Provider>
     );

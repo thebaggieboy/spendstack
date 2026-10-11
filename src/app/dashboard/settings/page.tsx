@@ -1,163 +1,155 @@
 "use client"
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/Card"
-import { Button } from "@/components/ui/Button"
-import { Upload, User, Bell, Shield, Wallet, LogOut } from "lucide-react"
-import { useAuth } from "@/contexts/AuthContext"
+import Link from "next/link"
+import { useState, useSyncExternalStore } from "react"
+import { Bell, CreditCard, LockKeyhole, Save, Settings2, ShieldCheck, UserRound } from "lucide-react"
+
+const SETTINGS_KEY = "spendstack_preferences"
+
+type Preferences = {
+    spendingAlerts: boolean
+    weeklySummary: boolean
+    productUpdates: boolean
+}
+
+const DEFAULT_PREFERENCES: Preferences = {
+    spendingAlerts: true,
+    weeklySummary: true,
+    productUpdates: false,
+}
+
+const preferenceRows: { key: keyof Preferences; title: string; detail: string }[] = [
+    {
+        key: "spendingAlerts",
+        title: "Spending alert reminders",
+        detail: "Show in-app reminders when tracked spending reaches an alert threshold.",
+    },
+    {
+        key: "weeklySummary",
+        title: "Weekly activity summary",
+        detail: "Keep the weekly spending summary preference enabled for future delivery options.",
+    },
+    {
+        key: "productUpdates",
+        title: "Product updates",
+        detail: "Opt in to occasional updates about new Spendstack features.",
+    },
+]
+
+function parsePreferences(stored: string): Preferences {
+    try {
+        return stored ? { ...DEFAULT_PREFERENCES, ...JSON.parse(stored) } : DEFAULT_PREFERENCES
+    } catch {
+        return DEFAULT_PREFERENCES
+    }
+}
+
+function subscribePreferences(onChange: () => void) {
+    window.addEventListener("storage", onChange)
+    window.addEventListener("spendstack-preferences-changed", onChange)
+    return () => {
+        window.removeEventListener("storage", onChange)
+        window.removeEventListener("spendstack-preferences-changed", onChange)
+    }
+}
+
+function getPreferencesSnapshot() {
+    return localStorage.getItem(SETTINGS_KEY) ?? ""
+}
+
+function getServerPreferencesSnapshot() {
+    return ""
+}
 
 export default function SettingsPage() {
-    const { user, logout } = useAuth()
+    const storedPreferences = useSyncExternalStore(
+        subscribePreferences,
+        getPreferencesSnapshot,
+        getServerPreferencesSnapshot,
+    )
+    const [draft, setDraft] = useState<Preferences | null>(null)
+    const preferences = draft ?? parsePreferences(storedPreferences)
+    const [saved, setSaved] = useState(false)
 
-    const initials = user
-        ? `${user.first_name?.[0] ?? ""}${user.last_name?.[0] ?? ""}`.toUpperCase() || user.email[0].toUpperCase()
-        : "?"
+    function savePreferences() {
+        localStorage.setItem(SETTINGS_KEY, JSON.stringify(preferences))
+        setDraft(null)
+        window.dispatchEvent(new Event("spendstack-preferences-changed"))
+        setSaved(true)
+        window.setTimeout(() => setSaved(false), 2500)
+    }
 
     return (
-        <div className="flex-1 space-y-6 p-8 pt-6 overflow-auto">
-            <div>
-                <h2 className="text-3xl font-bold tracking-tight text-foreground">Settings</h2>
-                <p className="text-muted-foreground mt-1">
-                    Manage your account preferences and application settings.
+        <main className="mx-auto w-full max-w-5xl space-y-7">
+            <header>
+                <p className="mb-2 inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-widest text-primary">
+                    <Settings2 className="h-4 w-4" /> Preferences
                 </p>
-            </div>
+                <h1 className="text-2xl font-semibold tracking-tight text-foreground sm:text-3xl">Settings</h1>
+                <p className="mt-2 text-sm text-muted-foreground">Manage your Spendstack preferences and account links.</p>
+            </header>
 
-            <div className="grid gap-6 md:grid-cols-4">
-                <div className="md:col-span-1 space-y-1 text-sm font-medium">
-                    <button className="flex w-full items-center justify-start rounded-lg bg-primary/10 px-3 py-2.5 text-primary transition-colors">
-                        <User className="mr-3 h-4 w-4" /> Account
-                    </button>
-                    <button className="flex w-full items-center justify-start rounded-lg px-3 py-2.5 text-muted-foreground hover:bg-muted hover:text-foreground transition-colors">
-                        <Wallet className="mr-3 h-4 w-4" /> Connected Banks
-                    </button>
-                    <button className="flex w-full items-center justify-start rounded-lg px-3 py-2.5 text-muted-foreground hover:bg-muted hover:text-foreground transition-colors">
-                        <Bell className="mr-3 h-4 w-4" /> Notifications
-                    </button>
-                    <button className="flex w-full items-center justify-start rounded-lg px-3 py-2.5 text-muted-foreground hover:bg-muted hover:text-foreground transition-colors">
-                        <Shield className="mr-3 h-4 w-4" /> Security
-                    </button>
+            <nav aria-label="Account pages" className="grid gap-3 sm:grid-cols-3">
+                <Link href="/dashboard/profile" className="flex items-center gap-3 rounded-2xl border border-border bg-white p-4 transition hover:border-primary/30 hover:shadow-sm">
+                    <span className="rounded-xl bg-primary/10 p-2.5 text-primary"><UserRound className="h-4 w-4" /></span>
+                    <span><span className="block text-sm font-semibold text-foreground">Profile</span><span className="mt-1 block text-xs text-muted-foreground">Personal information</span></span>
+                </Link>
+                <Link href="/dashboard/billing" className="flex items-center gap-3 rounded-2xl border border-border bg-white p-4 transition hover:border-primary/30 hover:shadow-sm">
+                    <span className="rounded-xl bg-primary/10 p-2.5 text-primary"><CreditCard className="h-4 w-4" /></span>
+                    <span><span className="block text-sm font-semibold text-foreground">Billing</span><span className="mt-1 block text-xs text-muted-foreground">Plan and subscription</span></span>
+                </Link>
+                <a href="#security" className="flex items-center gap-3 rounded-2xl border border-border bg-white p-4 transition hover:border-primary/30 hover:shadow-sm">
+                    <span className="rounded-xl bg-primary/10 p-2.5 text-primary"><ShieldCheck className="h-4 w-4" /></span>
+                    <span><span className="block text-sm font-semibold text-foreground">Security</span><span className="mt-1 block text-xs text-muted-foreground">Sign-in and data access</span></span>
+                </a>
+            </nav>
 
-                    <div className="pt-4 border-t border-border mt-4">
-                        <button
-                            onClick={logout}
-                            className="flex w-full items-center justify-start rounded-lg px-3 py-2.5 text-red-700 hover:bg-red-50 hover:text-red-800 transition-colors font-medium"
-                        >
-                            <LogOut className="mr-3 h-4 w-4" /> Sign Out
-                        </button>
+            <section className="rounded-2xl border border-border bg-white shadow-sm">
+                <div className="border-b border-border p-5 sm:p-6">
+                    <div className="flex items-center gap-3">
+                        <span className="rounded-xl bg-primary/10 p-2.5 text-primary"><Bell className="h-4 w-4" /></span>
+                        <div>
+                            <h2 className="text-sm font-semibold text-foreground">Notifications and preferences</h2>
+                            <p className="mt-1 text-xs text-muted-foreground">Choose which in-app and product reminders you prefer.</p>
+                        </div>
                     </div>
                 </div>
-
-                <div className="md:col-span-3 space-y-6">
-                    <Card>
-                        <CardHeader>
-                            <CardTitle>Profile Information</CardTitle>
-                            <CardDescription>
-                                Your personal details tied to your Spendstack account.
-                            </CardDescription>
-                        </CardHeader>
-                        <CardContent className="space-y-6">
-                            <div className="flex items-center gap-6">
-                                <div className="h-24 w-24 rounded-full bg-gradient-to-tr from-primary to-purple-500 flex items-center justify-center text-3xl font-bold text-white shadow-lg overflow-hidden relative group cursor-pointer">
-                                    <span>{initials}</span>
-                                    <div className="absolute inset-0 bg-black/60 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                                        <Upload className="h-6 w-6 text-white" />
-                                    </div>
-                                </div>
-                                <div>
-                                    <h3 className="font-medium text-lg text-foreground">
-                                        {user ? `${user.first_name} ${user.last_name}`.trim() || user.email : "Loading..."}
-                                    </h3>
-                                    <p className="text-sm text-muted-foreground">{user?.email}</p>
-                                    <p className="text-xs text-primary mt-1 font-medium">Free Tier</p>
-                                </div>
-                            </div>
-
-                            <div className="grid gap-4 md:grid-cols-2">
-                                <div className="space-y-2">
-                                    <label className="text-sm font-medium leading-none text-foreground">
-                                        First Name
-                                    </label>
-                                    <input
-                                        defaultValue={user?.first_name ?? ""}
-                                        className="flex h-10 w-full rounded-md border border-input bg-white px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50"
-                                    />
-                                </div>
-                                <div className="space-y-2">
-                                    <label className="text-sm font-medium leading-none text-foreground">
-                                        Last Name
-                                    </label>
-                                    <input
-                                        defaultValue={user?.last_name ?? ""}
-                                        className="flex h-10 w-full rounded-md border border-input bg-white px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50"
-                                    />
-                                </div>
-                                <div className="space-y-2 md:col-span-2">
-                                    <label className="text-sm font-medium leading-none text-foreground">
-                                        Email Address
-                                    </label>
-                                    <input
-                                        defaultValue={user?.email ?? ""}
-                                        type="email"
-                                        disabled
-                                        className="flex h-10 w-full rounded-md border border-input bg-muted px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus-visible:outline-none disabled:opacity-60 disabled:cursor-not-allowed"
-                                    />
-                                </div>
-                            </div>
-
-                            <Button variant="gradient" className="mt-4">
-                                Save Changes
-                            </Button>
-                        </CardContent>
-                    </Card>
-
-                    {/* Session Card */}
-                    <Card>
-                        <CardHeader>
-                            <CardTitle>Session</CardTitle>
-                            <CardDescription>Manage your current login session.</CardDescription>
-                        </CardHeader>
-                        <CardContent>
-                            <div className="flex items-center justify-between">
-                                <div>
-                                    <h4 className="font-medium text-sm text-foreground">Sign out of Spendstack</h4>
-                                    <p className="text-xs text-muted-foreground mt-1 max-w-[280px]">
-                                        You will be redirected to the login page and your session will be cleared from this device.
-                                    </p>
-                                </div>
-                                <Button
-                                    onClick={logout}
-                                    variant="outline"
-                                    className="border-red-500/30 text-red-400 hover:bg-red-500/10 hover:border-red-500/50 hover:text-red-300 flex items-center gap-2"
-                                >
-                                    <LogOut className="h-4 w-4" />
-                                    Logout
-                                </Button>
-                            </div>
-                        </CardContent>
-                    </Card>
-
-                    <Card className="border-red-500/20 bg-red-500/5">
-                        <CardHeader>
-                            <CardTitle className="text-red-500">Danger Zone</CardTitle>
-                            <CardDescription className="text-red-400/80">
-                                Irreversible actions for your account.
-                            </CardDescription>
-                        </CardHeader>
-                        <CardContent>
-                            <div className="flex items-center justify-between">
-                                <div>
-                                    <h4 className="font-medium text-sm">Delete Account</h4>
-                                    <p className="text-xs text-muted-foreground mt-1 max-w-[250px]">
-                                        Permanently delete your account and all associated data including uploaded statements.
-                                    </p>
-                                </div>
-                                <Button variant="destructive" size="sm" className="bg-red-500 hover:bg-red-600 text-white border-transparent">
-                                    Delete Account
-                                </Button>
-                            </div>
-                        </CardContent>
-                    </Card>
+                <div className="divide-y divide-border px-5 sm:px-6">
+                    {preferenceRows.map(({ key, title, detail }) => (
+                        <label key={key} className="flex cursor-pointer items-center justify-between gap-5 py-4">
+                            <span>
+                                <span className="block text-sm font-medium text-foreground">{title}</span>
+                                <span className="mt-1 block max-w-2xl text-xs leading-relaxed text-muted-foreground">{detail}</span>
+                            </span>
+                            <input
+                                type="checkbox"
+                                checked={preferences[key]}
+                                onChange={(event) => setDraft((current) => ({ ...(current ?? preferences), [key]: event.target.checked }))}
+                                className="h-4 w-4 shrink-0 accent-primary"
+                            />
+                        </label>
+                    ))}
                 </div>
-            </div>
-        </div>
+                <div className="flex flex-col gap-3 border-t border-border p-5 sm:flex-row sm:items-center sm:justify-between sm:px-6">
+                    <p className="text-xs text-muted-foreground">Preferences are saved in this browser. Email and push delivery are not configured.</p>
+                    <button type="button" onClick={savePreferences} className="inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-4 py-2.5 text-xs font-semibold text-primary-foreground transition hover:bg-primary/90">
+                        <Save className="h-4 w-4" /> {saved ? "Saved" : "Save preferences"}
+                    </button>
+                </div>
+            </section>
+
+            <section id="security" className="scroll-mt-24 rounded-2xl border border-border bg-white p-5 shadow-sm sm:p-6">
+                <div className="flex items-start gap-3">
+                    <span className="rounded-xl bg-primary/10 p-2.5 text-primary"><LockKeyhole className="h-4 w-4" /></span>
+                    <div>
+                        <h2 className="text-sm font-semibold text-foreground">Account security</h2>
+                        <p className="mt-1 max-w-2xl text-xs leading-relaxed text-muted-foreground">
+                            Your account uses a password and an expiring access token. You can sign out from your profile page to clear this browser’s session.
+                        </p>
+                        <Link href="/dashboard/profile" className="mt-4 inline-flex text-xs font-semibold text-primary hover:underline">Manage your profile and session</Link>
+                    </div>
+                </div>
+            </section>
+        </main>
     )
 }

@@ -3,6 +3,7 @@
 import useSWR from "swr"
 import { BarChart as BarChartIcon, Download, TrendingDown, TrendingUp, Minus } from "lucide-react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/Card"
+import ProFeatureGate from "@/components/billing/ProFeatureGate"
 import ExpenseChart from "@/components/dashboard/ExpenseChart"
 import CategoryBreakdown from "@/components/dashboard/CategoryBreakdown"
 import { fetchWithAuth } from "@/lib/fetcher"
@@ -27,7 +28,7 @@ function periodLabel(start: string, end: string) {
     return `${from} – ${to}`
 }
 
-export default function AnalyticsPage() {
+function AnalyticsContent() {
     const { data, error, isLoading } = useSWR<MonthlyComparison>(
         `${API_URL}dashboard/monthly-comparison/`,
         fetchWithAuth,
@@ -147,5 +148,13 @@ export default function AnalyticsPage() {
                 </Card>
             </div>
         </div>
+    )
+}
+
+export default function AnalyticsPage() {
+    return (
+        <ProFeatureGate feature="Advanced analytics and report exports">
+            <AnalyticsContent />
+        </ProFeatureGate>
     )
 }

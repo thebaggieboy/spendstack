@@ -43,7 +43,7 @@ const suggestedQuestions = [
     "Find recurring payments in my statements.",
 ]
 
-export default function StatementChatPage() {
+function StatementChatContent() {
     const { data: statements, error: statementsError, isLoading: statementsLoading } =
         useSWR<Statement[]>(`${API_URL}analysis/statements/`, fetchWithAuth)
     const [selectedStatement, setSelectedStatement] = useState("")
@@ -95,6 +95,7 @@ export default function StatementChatPage() {
         } finally {
             setIsSending(false)
         }
+
     }
 
     return (
@@ -294,4 +295,8 @@ export default function StatementChatPage() {
             </Card>
         </div>
     )
+}
+
+export default function StatementChatPage() {
+    return <StatementChatContent />
 }

@@ -182,11 +182,11 @@
 @keyframes section-enter {
   from {
     opacity: 0;
-    transform: translateY(14px);
+    transform: translateY(22px) scale(0.99);
   }
   to {
     opacity: 1;
-    transform: translateY(0);
+    transform: translateY(0) scale(1);
   }
 }
 
@@ -199,29 +199,80 @@
   }
 }
 
+@keyframes hero-content-enter {
+  from {
+    opacity: 0;
+    transform: translateY(28px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes hero-badge-drop {
+  0% {
+    opacity: 0;
+    transform: translateY(-64px) rotate(-3deg);
+  }
+  68% {
+    opacity: 1;
+    transform: translateY(5px) rotate(0.5deg);
+  }
+  84% {
+    transform: translateY(-2px) rotate(-0.2deg);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) rotate(0);
+  }
+}
+
 .route-enter {
   animation: route-enter 360ms cubic-bezier(0.2, 0.75, 0.25, 1) both;
   transform-origin: center top;
 }
 
-.landing-page > section {
-  animation: section-enter 580ms cubic-bezier(0.2, 0.75, 0.25, 1) both;
+.hero-title,
+.hero-description,
+.hero-actions,
+.hero-trust,
+.hero-dashboard-enter {
+  opacity: 0;
+  animation: hero-content-enter 900ms cubic-bezier(0.2, 0.75, 0.25, 1) both;
 }
 
-.landing-page > section:nth-child(2) {
-  animation-delay: 70ms;
+.hero-title {
+  animation-delay: 180ms;
 }
 
-.landing-page > section:nth-child(3) {
-  animation-delay: 120ms;
+.hero-description {
+  animation-delay: 760ms;
 }
 
-.landing-page > section:nth-child(4) {
-  animation-delay: 170ms;
+.hero-actions {
+  animation-delay: 1.32s;
 }
 
-.landing-page > section:nth-child(n + 5) {
-  animation-delay: 210ms;
+.hero-trust {
+  animation-delay: 1.82s;
+}
+
+.hero-dashboard-enter {
+  animation-delay: 1.02s;
+}
+
+.hero-badge {
+  opacity: 0;
+  animation: hero-badge-drop 1.2s cubic-bezier(0.2, 0.75, 0.25, 1) 2.35s both;
+}
+
+@supports (animation-timeline: view()) {
+  .landing-page > section {
+    animation: section-enter linear both;
+    animation-timeline: view();
+    animation-range: entry 0% entry 32%;
+  }
 }
 
 .hero-preview {
@@ -251,5 +302,19 @@
 
   .hero-preview:hover {
     transform: none;
+  }
+
+  .landing-page > section {
+    animation: none !important;
+  }
+
+  .hero-title,
+  .hero-description,
+  .hero-actions,
+  .hero-trust,
+  .hero-dashboard-enter,
+  .hero-badge {
+    opacity: 1;
+    animation: none !important;
   }
 }

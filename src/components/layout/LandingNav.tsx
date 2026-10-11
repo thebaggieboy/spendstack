@@ -2,26 +2,29 @@
 
 import Link from "next/link"
 import { useState, useEffect } from "react"
+import { usePathname } from "next/navigation"
 import { Menu, X, BarChart3, Sparkles } from "lucide-react"
 import { Button } from "@/components/ui/Button"
 import { cn } from "@/lib/utils"
 
 const NAV_LINKS = [
-    { label: "Features", href: "#features" },
-    { label: "Tax Engine", href: "#tax" },
-    { label: "AI Advisor", href: "#ai" },
-    { label: "How it works", href: "#how-it-works" },
+    { label: "Features", href: "/#features" },
+    { label: "Tax Engine", href: "/tax-engine" },
+    { label: "AI Advisor", href: "/ai-advisor" },
+    { label: "How it works", href: "/#how-it-works" },
 ]
 
 export default function LandingNav() {
     const [open, setOpen] = useState(false)
     const [scrolled, setScrolled] = useState(false)
+    const pathname = usePathname()
 
     useEffect(() => {
-        const handler = () => setScrolled(window.scrollY > 12)
+        const handler = () => setScrolled(pathname !== "/" || window.scrollY > 12)
+        handler()
         window.addEventListener("scroll", handler, { passive: true })
         return () => window.removeEventListener("scroll", handler)
-    }, [])
+    }, [pathname])
 
     // Lock body scroll when mobile menu is open
     useEffect(() => {
@@ -53,13 +56,13 @@ export default function LandingNav() {
                     {/* Desktop nav */}
                     <nav className="hidden md:flex items-center gap-1">
                         {NAV_LINKS.map((l) => (
-                            <a
+                            <Link
                                 key={l.label}
                                 href={l.href}
                                 className="px-3 py-1.5 text-sm text-muted-foreground hover:text-foreground rounded-md hover:bg-muted transition-colors"
                             >
                                 {l.label}
-                            </a>
+                            </Link>
                         ))}
                     </nav>
 
@@ -126,14 +129,14 @@ export default function LandingNav() {
                 {/* Drawer links */}
                 <nav className="flex-1 px-4 py-6 space-y-1">
                     {NAV_LINKS.map((l) => (
-                        <a
+                        <Link
                             key={l.label}
                             href={l.href}
                             onClick={() => setOpen(false)}
                             className="flex items-center px-3 py-2.5 rounded-lg text-sm text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
                         >
                             {l.label}
-                        </a>
+                        </Link>
                     ))}
                 </nav>
 

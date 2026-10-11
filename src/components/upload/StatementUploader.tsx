@@ -39,8 +39,8 @@ export default function StatementUploader() {
 
     const chooseFile = (candidate?: File) => {
         if (!candidate) return
-        if (!/\.(csv|pdf)$/i.test(candidate.name)) {
-            setError("Choose a CSV or PDF statement.")
+        if (!/\.(csv|pdf|xlsx|xls)$/i.test(candidate.name)) {
+            setError("Choose a CSV, Excel, or PDF statement.")
             return
         }
         if (candidate.size > MAX_FILE_SIZE) {
@@ -134,7 +134,7 @@ export default function StatementUploader() {
                     Upload bank statement
                 </CardTitle>
                 <CardDescription>
-                    Review detected transactions before they are added to your account. CSV and PDF files up to 10 MB are supported.
+                    Review detected transactions before they are added to your account. CSV, Excel, and PDF files up to 10 MB are supported.
                 </CardDescription>
             </CardHeader>
             <CardContent className="space-y-5">
@@ -157,7 +157,7 @@ export default function StatementUploader() {
                             id="file-upload"
                             type="file"
                             className="hidden"
-                            accept=".csv,.pdf"
+                            accept=".csv,.pdf,.xlsx,.xls"
                             onChange={event => chooseFile(event.target.files?.[0])}
                         />
                         {isProcessing ? (
@@ -189,7 +189,7 @@ export default function StatementUploader() {
                                 </div>
                                 <div>
                                     <p className="font-medium text-foreground">Click or drag a statement here</p>
-                                    <p className="text-sm text-muted-foreground">CSV or PDF · Maximum 10 MB</p>
+                                    <p className="text-sm text-muted-foreground">CSV, Excel, or PDF · Maximum 10 MB</p>
                                 </div>
                             </div>
                         )}
