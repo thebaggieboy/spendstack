@@ -20,7 +20,7 @@ export default function Header() {
     const displayName = user ? `${user.first_name} ${user.last_name}`.trim() || user.email : "Account"
 
     return (
-        <header className="h-16 flex items-center justify-between px-4 sm:px-6 bg-background/90 backdrop-blur-xl border-b border-border sticky top-0 z-40">
+        <header className="dashboard-chrome h-16 flex items-center justify-between px-4 sm:px-6 bg-background/90 backdrop-blur-xl border-b border-border sticky top-0 z-40">
             <div className="flex items-center gap-3">
                 {/* Mobile hamburger — wires to SidebarContext */}
                 <button

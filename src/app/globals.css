@@ -109,3 +109,147 @@
 .tracking-widest {
   letter-spacing: 1px;
 }
+
+.dashboard-typography .text-xs {
+  font-size: 0.67rem;
+}
+
+.dashboard-typography .text-sm {
+  font-size: 0.77rem;
+}
+
+.dashboard-typography .text-base {
+  font-size: 0.88rem;
+}
+
+.dashboard-typography .text-lg {
+  font-size: 0.98rem;
+}
+
+.dashboard-typography .text-xl {
+  font-size: 1.09rem;
+}
+
+.dashboard-typography .text-2xl {
+  font-size: 1.3rem;
+}
+
+.dashboard-typography .text-3xl {
+  font-size: 1.6rem;
+}
+
+.dashboard-typography .text-4xl {
+  font-size: 1.92rem;
+}
+
+.dashboard-typography .text-5xl {
+  font-size: 2.55rem;
+}
+
+.dashboard-typography .text-6xl {
+  font-size: 3.15rem;
+}
+
+@media (min-width: 640px) {
+  .dashboard-typography .sm\:text-4xl {
+    font-size: 1.92rem;
+  }
+}
+
+.dashboard-chrome .text-xs {
+  font-size: 0.67rem;
+}
+
+.dashboard-chrome .text-sm {
+  font-size: 0.77rem;
+}
+
+.dashboard-chrome .text-base {
+  font-size: 0.88rem;
+}
+
+@keyframes route-enter {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes section-enter {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes chart-bar-enter {
+  from {
+    transform: scaleY(0.12);
+  }
+  to {
+    transform: scaleY(1);
+  }
+}
+
+.route-enter {
+  animation: route-enter 360ms cubic-bezier(0.2, 0.75, 0.25, 1) both;
+  transform-origin: center top;
+}
+
+.landing-page > section {
+  animation: section-enter 580ms cubic-bezier(0.2, 0.75, 0.25, 1) both;
+}
+
+.landing-page > section:nth-child(2) {
+  animation-delay: 70ms;
+}
+
+.landing-page > section:nth-child(3) {
+  animation-delay: 120ms;
+}
+
+.landing-page > section:nth-child(4) {
+  animation-delay: 170ms;
+}
+
+.landing-page > section:nth-child(n + 5) {
+  animation-delay: 210ms;
+}
+
+.hero-preview {
+  transition: transform 400ms cubic-bezier(0.2, 0.75, 0.25, 1), box-shadow 400ms ease;
+}
+
+.hero-preview:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 32px 90px -38px rgba(35, 25, 70, 0.28);
+}
+
+.hero-chart-bar {
+  transform: scaleY(0);
+  transform-origin: bottom;
+  animation: chart-bar-enter 700ms cubic-bezier(0.2, 0.75, 0.25, 1) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  .hero-preview:hover {
+    transform: none;
+  }
+}

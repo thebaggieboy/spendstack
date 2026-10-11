@@ -22,7 +22,7 @@ import {
 
 export default function LandingPage() {
     return (
-        <div className="flex w-full flex-1 flex-col items-center font-sans">
+        <div className="landing-page flex w-full flex-1 flex-col items-center font-sans">
 
             {/* ─── Hero ─────────────────────────────────────────────────── */}
             <section className="mx-auto w-full max-w-6xl px-4 pt-14 pb-16 sm:px-6 sm:pt-20 sm:pb-20 lg:px-10 lg:pt-24 lg:pb-28">
@@ -63,7 +63,7 @@ export default function LandingPage() {
 
                     <div className="relative">
                         <div className="absolute -inset-5 rounded-[2rem] bg-primary/[0.04] blur-2xl" aria-hidden="true" />
-                        <div className="relative rounded-2xl border border-border bg-white p-4 shadow-[0_24px_80px_-32px_rgba(35,25,70,0.24)] sm:rounded-3xl sm:p-6 lg:p-7">
+                        <div className="hero-preview relative rounded-2xl border border-border bg-white p-4 shadow-[0_24px_80px_-32px_rgba(35,25,70,0.24)] sm:rounded-3xl sm:p-6 lg:p-7">
                             <div className="flex items-start justify-between gap-4">
                                 <div>
                                     <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">Your overview</p>
@@ -81,8 +81,8 @@ export default function LandingPage() {
                                 <div className="mt-5 flex h-20 items-end gap-1.5 sm:mt-6 sm:h-24 sm:gap-2" aria-label="Illustrative monthly cash flow chart">
                                     {[35, 52, 43, 67, 49, 76, 58, 88, 65, 96, 72, 82].map((height, index) => (
                                         <div key={index} className="flex h-full flex-1 items-end gap-0.5">
-                                            <div className="w-1/2 rounded-t-sm bg-violet-200" style={{ height: `${height}%` }} />
-                                            <div className="w-1/2 rounded-t-sm bg-primary" style={{ height: `${Math.max(16, height * 0.68)}%` }} />
+                                            <div className="hero-chart-bar w-1/2 rounded-t-sm bg-violet-200" style={{ height: `${height}%`, animationDelay: `${index * 35}ms` }} />
+                                            <div className="hero-chart-bar w-1/2 rounded-t-sm bg-primary" style={{ height: `${Math.max(16, height * 0.68)}%`, animationDelay: `${index * 35 + 45}ms` }} />
                                         </div>
                                     ))}
                                 </div>

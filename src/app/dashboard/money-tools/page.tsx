@@ -169,7 +169,7 @@ export default function MoneyToolsPage() {
                 </div>
             )}
 
-            <Card>
+            <Card id="recurring-bills" className="scroll-mt-24">
                 <CardHeader>
                     <div className="flex items-start gap-3">
                         <div className="rounded-xl border border-primary/10 bg-primary/5 p-2.5 text-primary">
@@ -216,7 +216,7 @@ export default function MoneyToolsPage() {
             </Card>
 
             <div className="grid gap-6 lg:grid-cols-2">
-                <Card>
+                <Card id="spending-alerts" className="scroll-mt-24">
                     <CardHeader>
                         <div className="flex items-start gap-3">
                             <div className="rounded-xl border border-amber-200 bg-amber-50 p-2.5 text-amber-700">
@@ -289,7 +289,7 @@ export default function MoneyToolsPage() {
                     </CardContent>
                 </Card>
 
-                <Card>
+                <Card id="transaction-rules" className="scroll-mt-24">
                     <CardHeader>
                         <div className="flex items-start gap-3">
                             <div className="rounded-xl border border-primary/10 bg-primary/5 p-2.5 text-primary">

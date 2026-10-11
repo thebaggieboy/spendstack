@@ -17,10 +17,12 @@ import {
     X,
     CalendarClock,
     MessageCircle,
+    Wrench,
 } from "lucide-react"
 
 const routes = [
     { label: "Dashboard",        icon: LayoutDashboard, href: "/dashboard",              color: "text-primary" },
+    { label: "Tools",            icon: Wrench,          href: "/dashboard/tools",        color: "text-primary" },
     //{ label: "Upload Statement", icon: Upload,           href: "/upload",                color: "text-emerald-500" },
     { label: "Statements",       icon: FileText,         href: "/dashboard/statements",  color: "text-indigo-400" },
     { label: "Transactions",     icon: ArrowRightLeft,   href: "/dashboard/transactions",color: "text-blue-500" },
@@ -76,7 +78,7 @@ export default function Sidebar() {
     return (
         <>
             {/* ── Desktop Sidebar (always visible ≥ md) ──────────────── */}
-            <aside className="hidden md:flex flex-col h-full w-64 shrink-0 bg-white border-r border-border py-6 px-3 z-50">
+            <aside className="dashboard-chrome hidden md:flex flex-col h-full w-64 shrink-0 bg-white border-r border-border py-6 px-3 z-50">
                 <Logo />
                 <nav className="flex-1 overflow-y-auto">
                     <NavLinks />
@@ -95,7 +97,7 @@ export default function Sidebar() {
             {/* ── Mobile Drawer (slides in from left) ─────────────────── */}
             <aside
                 className={cn(
-                    "fixed inset-y-0 left-0 z-[70] w-[260px] bg-card border-r border-border shadow-2xl flex flex-col py-6 px-3 md:hidden transition-transform duration-300 ease-in-out",
+                    "dashboard-chrome fixed inset-y-0 left-0 z-[70] w-[260px] bg-card border-r border-border shadow-2xl flex flex-col py-6 px-3 md:hidden transition-transform duration-300 ease-in-out",
                     isOpen ? "translate-x-0" : "-translate-x-full"
                 )}
             >
