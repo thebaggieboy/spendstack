@@ -22,40 +22,40 @@ import {
 
 export default function LandingPage() {
     return (
-        <div className="flex-1 flex flex-col items-center min-h-[80vh] font-sans">
+        <div className="flex w-full flex-1 flex-col items-center font-sans">
 
             {/* ─── Hero ─────────────────────────────────────────────────── */}
-            <section className="w-full max-w-6xl mx-auto px-6 pt-16 pb-20 lg:pt-20 lg:pb-28">
-                <div className="grid items-center gap-14 lg:grid-cols-[1.05fr_0.95fr] lg:gap-16">
+            <section className="mx-auto w-full max-w-6xl px-4 pt-14 pb-16 sm:px-6 sm:pt-20 sm:pb-20 lg:px-10 lg:pt-24 lg:pb-28">
+                <div className="grid items-center gap-10 sm:gap-12 lg:grid-cols-[1.05fr_0.95fr] lg:gap-16">
                     <div>
-                        <div className="inline-flex items-center gap-2 rounded-full border border-primary/15 bg-primary/5 px-3.5 py-2 text-xs font-medium text-primary mb-7">
+                        <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-primary/15 bg-primary/5 px-3 py-1.5 text-[11px] font-medium text-primary sm:mb-6 sm:px-3.5 sm:py-2 sm:text-xs">
                             <Sparkles className="h-3.5 w-3.5" />
                             Your intelligent financial copilot
                         </div>
 
-                        <h1 className="text-5xl md:text-6xl xl:text-7xl font-semibold tracking-tight mb-6 text-foreground leading-none">
+                        <h1 className="mb-5 text-4xl font-semibold tracking-tight leading-[1.05] text-foreground sm:mb-6 sm:text-5xl md:text-6xl xl:text-7xl">
                             Make every<br />
                             naira <span className="text-primary">count.</span>
                         </h1>
 
-                        <p className="text-base md:text-lg text-muted-foreground mb-9 max-w-xl leading-relaxed">
+                        <p className="mb-7 max-w-xl text-sm leading-relaxed text-muted-foreground sm:mb-8 sm:text-base md:text-lg">
                             Turn bank statements into a clear picture of your money. Track spending, understand your taxes, and make confident decisions — all in one place.
                         </p>
 
-                        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
-                            <Link href="/dashboard">
-                                <Button size="lg" className="h-12 px-7 text-sm font-semibold w-full sm:w-auto rounded-xl">
+                        <div className="flex flex-col items-stretch gap-2.5 min-[420px]:flex-row min-[420px]:items-center sm:gap-3">
+                            <Link href="/dashboard" className="w-full min-[420px]:w-auto">
+                                <Button size="lg" className="h-11 w-full rounded-xl px-5 text-sm font-semibold sm:h-12 sm:w-auto sm:px-7">
                                     Get Started Free
                                     <ArrowRight className="ml-2 h-4 w-4" />
                                 </Button>
                             </Link>
-                            <a href="#features" className="inline-flex h-12 items-center justify-center gap-2 rounded-xl border border-border bg-white px-6 text-sm font-medium text-foreground transition hover:bg-muted">
+                            <a href="#features" className="inline-flex h-11 w-full items-center justify-center gap-2 rounded-xl border border-border bg-white px-5 text-sm font-medium text-foreground transition hover:bg-muted min-[420px]:w-auto sm:h-12 sm:px-6">
                                 Explore features
                                 <ArrowRight className="h-4 w-4" />
                             </a>
                         </div>
 
-                        <div className="mt-8 flex flex-wrap items-center gap-x-6 gap-y-2 text-xs text-muted-foreground">
+                        <div className="mt-6 flex flex-wrap items-center gap-x-4 gap-y-2 text-[11px] text-muted-foreground sm:mt-8 sm:gap-x-6 sm:text-xs">
                             <span className="inline-flex items-center gap-2"><CheckCircle2 className="h-4 w-4 text-emerald-600" />No bank login required</span>
                             <span className="inline-flex items-center gap-2"><ShieldCheck className="h-4 w-4 text-emerald-600" />Your data stays yours</span>
                         </div>
@@ -63,22 +63,22 @@ export default function LandingPage() {
 
                     <div className="relative">
                         <div className="absolute -inset-5 rounded-[2rem] bg-primary/[0.04] blur-2xl" aria-hidden="true" />
-                        <div className="relative rounded-3xl border border-border bg-white p-5 shadow-[0_24px_80px_-32px_rgba(35,25,70,0.24)] sm:p-7">
+                        <div className="relative rounded-2xl border border-border bg-white p-4 shadow-[0_24px_80px_-32px_rgba(35,25,70,0.24)] sm:rounded-3xl sm:p-6 lg:p-7">
                             <div className="flex items-start justify-between gap-4">
                                 <div>
                                     <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">Your overview</p>
-                                    <p className="mt-2 text-2xl font-semibold tracking-tight text-foreground">Money, made clear</p>
+                                    <p className="mt-2 text-xl font-semibold tracking-tight text-foreground sm:text-2xl">Money, made clear</p>
                                 </div>
                                 <span className="rounded-full bg-emerald-50 px-3 py-1 text-xs font-medium text-emerald-700">This month</span>
                             </div>
 
-                            <div className="mt-7 rounded-2xl bg-slate-50 p-5">
+                            <div className="mt-5 rounded-xl bg-slate-50 p-4 sm:mt-7 sm:rounded-2xl sm:p-5">
                                 <p className="text-xs text-muted-foreground">Monthly cash flow</p>
                                 <div className="mt-2 flex items-end justify-between gap-4">
-                                    <p className="text-3xl font-semibold tracking-tight text-foreground">₦842,500</p>
+                                    <p className="text-2xl font-semibold tracking-tight text-foreground sm:text-3xl">₦842,500</p>
                                     <span className="rounded-lg bg-emerald-100 px-2.5 py-1 text-xs font-medium text-emerald-700">+12.8%</span>
                                 </div>
-                                <div className="mt-6 flex h-24 items-end gap-2" aria-label="Illustrative monthly cash flow chart">
+                                <div className="mt-5 flex h-20 items-end gap-1.5 sm:mt-6 sm:h-24 sm:gap-2" aria-label="Illustrative monthly cash flow chart">
                                     {[35, 52, 43, 67, 49, 76, 58, 88, 65, 96, 72, 82].map((height, index) => (
                                         <div key={index} className="flex h-full flex-1 items-end gap-0.5">
                                             <div className="w-1/2 rounded-t-sm bg-violet-200" style={{ height: `${height}%` }} />
@@ -91,15 +91,15 @@ export default function LandingPage() {
                                 </div>
                             </div>
 
-                            <div className="mt-4 grid grid-cols-2 gap-3">
-                                <div className="rounded-2xl border border-border p-4">
+                            <div className="mt-3 grid grid-cols-2 gap-2 sm:mt-4 sm:gap-3">
+                                <div className="rounded-xl border border-border p-3 sm:rounded-2xl sm:p-4">
                                     <p className="text-xs text-muted-foreground">Income</p>
-                                    <p className="mt-2 text-lg font-semibold text-foreground">₦1.24m</p>
+                                    <p className="mt-2 text-base font-semibold text-foreground sm:text-lg">₦1.24m</p>
                                     <p className="mt-1 text-xs text-emerald-700">↑ 8.4% this month</p>
                                 </div>
-                                <div className="rounded-2xl border border-border p-4">
+                                <div className="rounded-xl border border-border p-3 sm:rounded-2xl sm:p-4">
                                     <p className="text-xs text-muted-foreground">Spent</p>
-                                    <p className="mt-2 text-lg font-semibold text-foreground">₦397.5k</p>
+                                    <p className="mt-2 text-base font-semibold text-foreground sm:text-lg">₦397.5k</p>
                                     <p className="mt-1 text-xs text-primary">Across 6 categories</p>
                                 </div>
                             </div>
@@ -110,8 +110,8 @@ export default function LandingPage() {
             </section>
 
             {/* ─── Stats Bar ────────────────────────────────────────────── */}
-            <section className="w-full border-y border-border bg-slate-50/70 py-9">
-                <div className="max-w-5xl mx-auto px-6 grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
+            <section className="w-full border-y border-border bg-slate-50/70 py-7 sm:py-9">
+                <div className="mx-auto grid max-w-5xl grid-cols-2 gap-x-3 gap-y-6 px-4 text-center sm:gap-x-8 sm:gap-y-8 sm:px-6 md:grid-cols-4">
                     {[
                         { label: "Bank Formats Supported", value: "20+" },
                         { label: "Transactions Processed", value: "1M+" },
@@ -119,24 +119,24 @@ export default function LandingPage() {
                         { label: "Average Time Saved", value: "4 hrs/mo" },
                     ].map((stat) => (
                         <div key={stat.label}>
-                            <p className="text-2xl md:text-3xl font-semibold tracking-tight text-foreground">{stat.value}</p>
-                            <p className="text-xs md:text-sm text-muted-foreground mt-2">{stat.label}</p>
+                            <p className="text-xl font-semibold tracking-tight text-foreground sm:text-2xl md:text-3xl">{stat.value}</p>
+                            <p className="mt-1.5 text-[11px] leading-snug text-muted-foreground sm:mt-2 sm:text-xs md:text-sm">{stat.label}</p>
                         </div>
                     ))}
                 </div>
             </section>
 
             {/* ─── Feature Deep-Dives ───────────────────────────────────── */}
-            <section id="features" className="w-full max-w-6xl mx-auto py-24 px-6 space-y-28 lg:py-28">
+            <section id="features" className="mx-auto w-full max-w-6xl space-y-16 px-4 py-16 sm:space-y-24 sm:px-6 sm:py-20 lg:space-y-28 lg:px-10 lg:py-28">
 
                 {/* Tax Calculation Engine */}
-                <div id="tax" className="grid grid-cols-1 md:grid-cols-2 gap-12 lg:gap-20 items-center">
-                    <div className="space-y-6">
+                <div id="tax" className="grid grid-cols-1 items-center gap-8 sm:gap-10 md:grid-cols-2 lg:gap-16">
+                    <div className="space-y-4 sm:space-y-6">
                         <div className="inline-flex items-center justify-center h-11 w-11 rounded-xl bg-primary/5 border border-primary/10 text-primary">
                             <Calculator className="h-5 w-5" />
                         </div>
-                        <h2 className="text-3xl md:text-4xl font-semibold tracking-tight">Smart Tax Calculation Engine</h2>
-                        <p className="text-muted-foreground text-base leading-relaxed">
+                        <h2 className="text-2xl font-semibold tracking-tight sm:text-3xl md:text-4xl">Smart Tax Calculation Engine</h2>
+                        <p className="text-sm leading-relaxed text-muted-foreground sm:text-base">
                             Never dread tax season again. Spendstack automatically estimates your Personal Income
                             Tax (PIT) liability using FIRS-compliant brackets. It surfaces deductible expenses
                             buried in your transactions, so you keep more of what you earn.
@@ -157,7 +157,7 @@ export default function LandingPage() {
                     </div>
 
                     {/* Tax Engine Visual */}
-                    <div className="bg-white border border-border rounded-3xl p-6 sm:p-8 space-y-4 shadow-sm">
+                    <div className="space-y-3 rounded-2xl border border-border bg-white p-4 shadow-sm sm:space-y-4 sm:rounded-3xl sm:p-7">
                         <p className="text-xs font-medium text-muted-foreground uppercase tracking-widest">Tax Summary Preview</p>
                         {[
                             { label: "Annual Gross Income", value: "₦4,800,000", color: "text-foreground" },
@@ -175,9 +175,9 @@ export default function LandingPage() {
                 </div>
 
                 {/* AI Financial Advisor */}
-                <div id="ai" className="grid grid-cols-1 md:grid-cols-2 gap-12 lg:gap-20 items-center">
+                <div id="ai" className="grid grid-cols-1 items-center gap-8 sm:gap-10 md:grid-cols-2 lg:gap-16">
                     {/* AI Chat Visual */}
-                    <div className="order-2 md:order-1 bg-muted/20 border border-border rounded-2xl p-8 space-y-4">
+                    <div className="order-2 space-y-3 rounded-2xl border border-border bg-muted/20 p-4 sm:space-y-4 sm:p-7 md:order-1">
                         <p className="text-xs font-medium text-muted-foreground uppercase tracking-widest mb-2">AI Advisor — Sample Conversation</p>
                         {[
                             { role: "user", text: "Where did most of my money go last month?" },
@@ -187,13 +187,13 @@ export default function LandingPage() {
                         ].map((msg, i) => (
                             <div
                                 key={i}
-                                className={`flex gap-3 ${msg.role === "user" ? "flex-row-reverse" : ""}`}
+                                className={`flex gap-2.5 sm:gap-3 ${msg.role === "user" ? "flex-row-reverse" : ""}`}
                             >
                                 <div className={`flex-shrink-0 h-7 w-7 rounded-full border border-border flex items-center justify-center text-xs font-bold
                                     ${msg.role === "ai" ? "bg-primary/10 text-primary" : "bg-muted text-muted-foreground"}`}>
                                     {msg.role === "ai" ? "AI" : "U"}
                                 </div>
-                                <div className={`max-w-[80%] rounded-xl px-4 py-2.5 text-sm leading-relaxed
+                                <div className={`max-w-[85%] rounded-xl px-3 py-2 text-xs leading-relaxed sm:px-4 sm:py-2.5 sm:text-sm
                                     ${msg.role === "ai"
                                         ? "bg-muted/40 border border-border text-foreground"
                                         : "bg-primary text-primary-foreground"
@@ -204,12 +204,12 @@ export default function LandingPage() {
                         ))}
                     </div>
 
-                    <div className="order-1 md:order-2 space-y-6">
+                    <div className="order-1 space-y-4 sm:space-y-6 md:order-2">
                         <div className="inline-flex items-center justify-center h-10 w-10 rounded-lg bg-muted border border-border text-foreground">
                             <MessageSquare className="h-5 w-5" />
                         </div>
-                        <h2 className="text-3xl font-semibold tracking-tight">AI Financial Advisor</h2>
-                        <p className="text-muted-foreground text-base leading-relaxed">
+                        <h2 className="text-2xl font-semibold tracking-tight sm:text-3xl">AI Financial Advisor</h2>
+                        <p className="text-sm leading-relaxed text-muted-foreground sm:text-base">
                             Ask your finances anything — in plain English. Your AI advisor is trained on
                             your actual transaction history, so every insight is specific to you, not
                             generic advice from a template.
@@ -231,13 +231,13 @@ export default function LandingPage() {
                 </div>
 
                 {/* Zero-Touch Categorization */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-12 lg:gap-20 items-center">
-                    <div className="space-y-6">
+                <div className="grid grid-cols-1 items-center gap-8 sm:gap-10 md:grid-cols-2 lg:gap-16">
+                    <div className="space-y-4 sm:space-y-6">
                         <div className="inline-flex items-center justify-center h-10 w-10 rounded-lg bg-muted border border-border text-foreground">
                             <BrainCircuit className="h-5 w-5" />
                         </div>
-                        <h2 className="text-3xl font-semibold tracking-tight">Zero-Touch Categorization</h2>
-                        <p className="text-muted-foreground text-base leading-relaxed">
+                        <h2 className="text-2xl font-semibold tracking-tight sm:text-3xl">Zero-Touch Categorization</h2>
+                        <p className="text-sm leading-relaxed text-muted-foreground sm:text-base">
                             Upload your statements exactly as you download them. Spendstack intelligently
                             processes NIP transfers, USSD, and POS transactions across all major Nigerian banks,
                             delivering an organized financial breakdown in seconds.
@@ -258,7 +258,7 @@ export default function LandingPage() {
                     </div>
 
                     {/* Categories Visual */}
-                    <div className="bg-muted/20 border border-border rounded-2xl p-8 space-y-3">
+                    <div className="space-y-3 rounded-2xl border border-border bg-muted/20 p-4 sm:p-7">
                         <p className="text-xs font-medium text-muted-foreground uppercase tracking-widest mb-2">Spending Breakdown</p>
                         {[
                             { label: "Food & Dining", pct: 31, color: "bg-orange-400" },
@@ -283,15 +283,15 @@ export default function LandingPage() {
             </section>
 
             {/* ─── How It Works ─────────────────────────────────────────── */}
-            <section id="how-it-works" className="w-full border-y border-border bg-slate-50/70 py-24">
-                <div className="max-w-5xl mx-auto px-6">
-                    <div className="text-center mb-16">
-                        <h2 className="text-3xl font-semibold tracking-tight mb-3">How it works</h2>
-                        <p className="text-muted-foreground max-w-md mx-auto text-sm">
+            <section id="how-it-works" className="w-full border-y border-border bg-slate-50/70 py-16 sm:py-20 lg:py-24">
+                <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
+                    <div className="mb-10 text-center sm:mb-14 lg:mb-16">
+                        <h2 className="mb-3 text-2xl font-semibold tracking-tight sm:text-3xl">How it works</h2>
+                        <p className="mx-auto max-w-md text-xs text-muted-foreground sm:text-sm">
                             From raw bank statement to rich financial intelligence in three simple steps.
                         </p>
                     </div>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <div className="grid grid-cols-1 gap-6 sm:gap-8 md:grid-cols-3">
                         {[
                             {
                                 icon: Upload,
@@ -312,13 +312,13 @@ export default function LandingPage() {
                                 desc: "Explore your dashboard, review your tax position, and chat with your AI advisor.",
                             },
                         ].map((s) => (
-                            <div key={s.step} className="relative pl-6 border-l border-border space-y-4">
+                            <div key={s.step} className="relative space-y-3 border-l border-border pl-5 sm:space-y-4 sm:pl-6">
                                 <p className="text-xs font-mono text-muted-foreground">{s.step}</p>
                                 <div className="h-9 w-9 rounded-lg bg-muted border border-border flex items-center justify-center">
                                     <s.icon className="h-4 w-4 text-foreground" />
                                 </div>
-                                <h3 className="text-base font-semibold text-foreground">{s.title}</h3>
-                                <p className="text-sm text-muted-foreground leading-relaxed">{s.desc}</p>
+                                <h3 className="text-sm font-semibold text-foreground sm:text-base">{s.title}</h3>
+                                <p className="text-xs leading-relaxed text-muted-foreground sm:text-sm">{s.desc}</p>
                             </div>
                         ))}
                     </div>
@@ -326,13 +326,13 @@ export default function LandingPage() {
             </section>
 
             {/* ─── Feature Grid ─────────────────────────────────────────── */}
-            <section className="w-full border-t border-border py-20">
-                <div className="max-w-6xl mx-auto px-6">
-                    <div className="max-w-xl mb-12">
-                        <p className="text-xs font-semibold uppercase tracking-widest text-primary mb-3">More control, less busywork</p>
-                        <h2 className="text-3xl md:text-4xl font-semibold tracking-tight text-foreground">The details that make money easier</h2>
+            <section className="w-full border-t border-border py-16 sm:py-20 lg:py-24">
+                <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-10">
+                    <div className="mb-8 max-w-xl sm:mb-10 lg:mb-12">
+                        <p className="mb-3 text-[11px] font-semibold uppercase tracking-widest text-primary sm:text-xs">More control, less busywork</p>
+                        <h2 className="text-2xl font-semibold tracking-tight text-foreground sm:text-3xl md:text-4xl">The details that make money easier</h2>
                     </div>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                    <div className="grid grid-cols-1 gap-3 min-[480px]:grid-cols-2 sm:gap-4 lg:grid-cols-3 xl:grid-cols-4">
                     {[
                         {
                             icon: BarChart3,
@@ -385,12 +385,12 @@ export default function LandingPage() {
                             desc: "Use transaction descriptions to recognize transfers, so moving money is not mistaken for income or spending.",
                         },
                     ].map((feat) => (
-                        <div key={feat.title} className="rounded-2xl border border-border bg-white p-5 transition hover:-translate-y-0.5 hover:shadow-md">
+                        <div key={feat.title} className="rounded-xl border border-border bg-white p-4 transition hover:-translate-y-0.5 hover:shadow-md sm:rounded-2xl sm:p-5">
                             <div className="h-10 w-10 rounded-xl bg-primary/5 border border-primary/10 flex items-center justify-center">
                                 <feat.icon className="h-4 w-4 text-primary" />
                             </div>
-                            <h3 className="mt-5 text-sm font-semibold text-foreground">{feat.title}</h3>
-                            <p className="mt-2 text-sm text-muted-foreground leading-relaxed">{feat.desc}</p>
+                            <h3 className="mt-4 text-sm font-semibold text-foreground sm:mt-5">{feat.title}</h3>
+                            <p className="mt-2 text-xs leading-relaxed text-muted-foreground sm:text-sm">{feat.desc}</p>
                         </div>
                     ))}
                     </div>
@@ -398,13 +398,13 @@ export default function LandingPage() {
             </section>
 
             {/* ─── CTA ──────────────────────────────────────────────────── */}
-            <section className="w-full border-t border-border py-28 px-6 text-center">
-                <h2 className="text-3xl font-bold tracking-tight mb-4 text-foreground">Ready to take control?</h2>
-                <p className="text-muted-foreground text-base mb-8 max-w-md mx-auto">
+            <section className="w-full border-t border-border px-4 py-20 text-center sm:px-6 sm:py-24 lg:py-28">
+                <h2 className="mb-4 text-2xl font-bold tracking-tight text-foreground sm:text-3xl">Ready to take control?</h2>
+                <p className="mx-auto mb-7 max-w-md text-sm text-muted-foreground sm:mb-8 sm:text-base">
                     Join thousands of users who use Spendstack to track their money, understand their taxes, and save smarter.
                 </p>
                 <Link href="/dashboard">
-                    <Button size="lg" className="h-12 px-10 text-sm font-semibold">
+                    <Button size="lg" className="h-11 px-8 text-sm font-semibold sm:h-12 sm:px-10">
                         Start for free
                         <ArrowRight className="ml-2 h-4 w-4" />
                     </Button>

@@ -16,10 +16,23 @@ type Statement = {
 type ChatMessage = {
     role: "user" | "assistant"
     content: string
+    sources?: ChatSource[]
+}
+
+type ChatSource = {
+    transaction_id: number
+    source_id: string
+    statement_id: number | null
+    statement: string | null
+    date: string | null
+    merchant: string
+    category: string
+    amount: string
 }
 
 type ChatResponse = {
     answer: string
+    sources: ChatSource[]
 }
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL
@@ -68,7 +81,11 @@ export default function StatementChatPage() {
                     history: previousMessages.slice(-8),
                 }),
             })
-            setMessages([...nextMessages, { role: "assistant", content: response.answer }])
+            setMessages([...nextMessages, {
+                role: "assistant",
+                content: response.answer,
+                sources: response.sources ?? [],
+            }])
         } catch (requestError) {
             setError(
                 requestError instanceof Error
@@ -187,6 +204,31 @@ export default function StatementChatPage() {
                                         }`}
                                     >
                                         <p className="whitespace-pre-wrap">{message.content}</p>
+                                        {message.role === "assistant" && message.sources && message.sources.length > 0 && (
+                                            <div className="mt-3 border-t border-border/70 pt-2">
+                                                <p className="mb-2 text-xs font-semibold text-muted-foreground">Sources</p>
+                                                <div className="flex flex-wrap gap-2">
+                                                    {message.sources.map(source => (
+                                                        source.statement_id ? (
+                                                            <Link
+                                                                key={source.transaction_id}
+                                                                href={`/dashboard/statements/${source.statement_id}#transaction-${source.transaction_id}`}
+                                                                className="rounded-lg border border-border bg-white px-2.5 py-1.5 text-xs text-foreground hover:border-primary/50 hover:text-primary"
+                                                            >
+                                                                {source.merchant} · {source.date ?? "Undated"} · {source.source_id}
+                                                            </Link>
+                                                        ) : (
+                                                            <span
+                                                                key={source.transaction_id}
+                                                                className="rounded-lg border border-border bg-white px-2.5 py-1.5 text-xs text-foreground"
+                                                            >
+                                                                {source.merchant} · {source.date ?? "Undated"} · {source.source_id}
+                                                            </span>
+                                                        )
+                                                    ))}
+                                                </div>
+                                            </div>
+                                        )}
                                     </div>
                                     {message.role === "user" && (
                                         <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-muted text-muted-foreground">

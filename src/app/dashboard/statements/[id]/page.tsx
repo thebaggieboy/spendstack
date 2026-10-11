@@ -280,7 +280,7 @@ export default function StatementDetailPage() {
                                     <div className="text-center text-sm text-muted-foreground py-10">No results found</div>
                                 ) : (
                                     filteredTx.map(tx => (
-                                        <div key={tx.id} className="grid grid-cols-12 gap-3 items-center px-4 py-3 hover:bg-muted/50 transition-colors rounded-xl group">
+                                        <div id={`transaction-${tx.id}`} key={tx.id} className="grid grid-cols-12 gap-3 items-center px-4 py-3 hover:bg-muted/50 transition-colors rounded-xl group scroll-mt-24">
                                             <div className="col-span-5 flex items-center gap-3 min-w-0">
                                                 <div className={`p-2 rounded-lg flex-shrink-0 ${tx.amount > 0 ? "bg-emerald-50" : "bg-rose-50"}`}>
                                                     {tx.amount > 0

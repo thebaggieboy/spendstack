@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useMemo } from "react"
+import { Download } from "lucide-react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/Card"
 import { Calculator, TrendingDown, Wallet, Percent, Info, ChevronDown, ChevronUp } from "lucide-react"
 import {
@@ -190,6 +191,31 @@ export default function TaxPage() {
         .filter(b => b.tax > 0)
         .map(b => ({ name: b.label, "Tax Paid": b.tax / divisor, fill: b.color }))
 
+    const exportBreakdown = () => {
+        const rows = [
+            ["Spendstack tax estimate", "Annual NGN"],
+            ["Gross employment income", grossIncome.toFixed(2)],
+            ["Pension contribution entered", result.pensionDeduction.toFixed(2)],
+            ["NHF contribution entered", result.nhfDeduction.toFixed(2)],
+            ["NHIS contribution entered", result.nhisDeduction.toFixed(2)],
+            ["Qualifying life insurance entered", result.lifeInsuranceDeduction.toFixed(2)],
+            ["Owner-occupied mortgage interest entered", result.mortgageInterestDeduction.toFixed(2)],
+            ["Rent relief applied", result.rentRelief.toFixed(2)],
+            ["Total deductions", result.totalDeductions.toFixed(2)],
+            ["Chargeable income", result.chargeableIncome.toFixed(2)],
+            ...result.bands.map(band => [`${band.label} (${band.rate * 100}%)`, band.tax.toFixed(2)]),
+            ["Estimated PAYE", result.totalTax.toFixed(2)],
+            ["Estimated net after PAYE and entered payroll contributions", result.netIncome.toFixed(2)],
+        ]
+        const csv = rows.map(row => row.map(value => `"${value.replaceAll('"', '""')}"`).join(",")).join("\n")
+        const url = URL.createObjectURL(new Blob([csv], { type: "text/csv;charset=utf-8" }))
+        const link = document.createElement("a")
+        link.href = url
+        link.download = "spendstack-tax-estimate.csv"
+        link.click()
+        URL.revokeObjectURL(url)
+    }
+
     const summaryCards = [
         { label: "Total PAYE Tax", value: formatFull(result.totalTax / divisor), sub: view === "monthly" ? "per month" : "per year", color: "from-red-50 to-rose-50", border: "border-red-200", icon: TrendingDown, iconColor: "text-red-700" },
         { label: "Net Take-Home", value: formatFull(result.netIncome / divisor), sub: view === "monthly" ? "per month" : "per year", color: "from-emerald-50 to-green-50", border: "border-emerald-200", icon: Wallet, iconColor: "text-emerald-700" },
@@ -314,8 +340,8 @@ export default function TaxPage() {
                                         className="mt-0.5 accent-primary"
                                     />
                                     <span>
-                                        Claim rent relief
-                                        <span className="block text-xs text-muted-foreground">20% of annual rent paid, capped at ₦500,000</span>
+                                        Claim rent relief (if eligible)
+                                        <span className="block text-xs text-muted-foreground">20% of annual rent paid, capped at ₦500,000. Enter only rent you paid and can substantiate; homeowners are not eligible.</span>
                                     </span>
                                 </label>
 
@@ -446,6 +472,20 @@ export default function TaxPage() {
                     <p className="text-xs text-muted-foreground mt-4">
                         Estimates assume Nigerian individual employment income under the Nigeria Tax Act 2025, effective January 1, 2026. They use the eligible deductions entered above; eligibility and actual PAYE may vary with your circumstances and supporting documents. Confirm your assessment with your State Internal Revenue Service or a qualified tax professional.
                     </p>
+                    <div className="mt-4 rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-950">
+                        <p className="font-semibold">How to interpret this estimate</p>
+                        <p className="mt-1 text-xs leading-relaxed">
+                            This is a simplified progressive-band estimate, not a filed assessment or payroll calculation. It assumes all entered amounts are valid deductions, caps total deductions at gross income, applies the rent-relief cap shown above, and subtracts PAYE plus the entered pension/NHF/NHIS amounts when estimating take-home. Other income, exemptions, statutory interpretation, employer payroll treatment, and current official guidance are not verified here.
+                        </p>
+                    </div>
+                    <button
+                        type="button"
+                        onClick={exportBreakdown}
+                        className="mt-4 inline-flex items-center gap-2 rounded-lg border border-border bg-white px-3 py-2 text-sm font-medium text-foreground transition hover:bg-muted"
+                    >
+                        <Download className="h-4 w-4" />
+                        Export annual breakdown
+                    </button>
                 </CardContent>
             </Card>
         </div>

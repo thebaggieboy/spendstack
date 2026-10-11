@@ -2,9 +2,30 @@
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
-import { Upload, FileText, CheckCircle2, Loader2, Sparkles, AlertCircle } from "lucide-react"
+import { AlertCircle, CheckCircle2, FileText, Loader2, Sparkles, Upload } from "lucide-react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/Card"
 import { Button } from "@/components/ui/Button"
+import { requestWithAuth } from "@/lib/fetcher"
+
+type PreviewTransaction = {
+    index: number
+    date: string
+    description: string
+    merchant: string
+    category: string
+    is_transfer: boolean
+    amount: string
+}
+
+type StatementPreview = {
+    preview_id: number
+    filename: string
+    transactions: PreviewTransaction[]
+    warnings: string[]
+}
+
+const API_URL = process.env.NEXT_PUBLIC_API_URL
+const MAX_FILE_SIZE = 10 * 1024 * 1024
 
 export default function StatementUploader() {
     const router = useRouter()
@@ -13,160 +34,225 @@ export default function StatementUploader() {
     const [isProcessing, setIsProcessing] = useState(false)
     const [isComplete, setIsComplete] = useState(false)
     const [error, setError] = useState<string | null>(null)
-    const [summary, setSummary] = useState<string>("")
+    const [summary, setSummary] = useState("")
+    const [preview, setPreview] = useState<StatementPreview | null>(null)
 
-    const handleDrop = (e: React.DragEvent) => {
-        e.preventDefault()
-        setIsHovering(false)
-        const droppedFile = e.dataTransfer.files[0]
-        if (droppedFile && (droppedFile.type === "text/csv" || droppedFile.type === "application/pdf")) {
-            setFile(droppedFile)
-            setError(null)
+    const chooseFile = (candidate?: File) => {
+        if (!candidate) return
+        if (!/\.(csv|pdf)$/i.test(candidate.name)) {
+            setError("Choose a CSV or PDF statement.")
+            return
         }
+        if (candidate.size > MAX_FILE_SIZE) {
+            setError("Statement files must be 10 MB or smaller.")
+            return
+        }
+        setFile(candidate)
+        setPreview(null)
+        setError(null)
+    }
+
+    const handleDrop = (event: React.DragEvent) => {
+        event.preventDefault()
+        setIsHovering(false)
+        chooseFile(event.dataTransfer.files[0])
     }
 
     const handleProcess = async () => {
-        if (!file) return;
-
+        if (!file) return
         setIsProcessing(true)
         setError(null)
-
         const formData = new FormData()
-        formData.append('file', file)
+        formData.append("file", file)
 
         try {
-            const token = localStorage.getItem("accessToken");
-            const headers: HeadersInit = {};
-            if (token) {
-                headers["Authorization"] = `Bearer ${token}`;
-            }
-
-            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}analysis/upload/`, {
-                method: 'POST',
-                headers,
-                body: formData
+            const result = await requestWithAuth<StatementPreview>(`${API_URL}analysis/preview/`, {
+                method: "POST",
+                body: formData,
             })
-
-            const data = await res.json()
-
-            if (!res.ok) {
-                throw new Error(data.error || "Failed to process statement")
-            }
-
-            setSummary(data.message || "Successfully processed your statement.")
-            setIsProcessing(false)
-            setIsComplete(true)
-        } catch (err: any) {
-            setError(err.message)
+            setPreview(result)
+        } catch (requestError) {
+            setError(requestError instanceof Error ? requestError.message : "Could not analyze the statement.")
+        } finally {
             setIsProcessing(false)
         }
+    }
+
+    const confirmImport = async () => {
+        if (!preview) return
+        setIsProcessing(true)
+        setError(null)
+        try {
+            const result = await requestWithAuth<{ message: string }>(
+                `${API_URL}analysis/preview/${preview.preview_id}/confirm/`,
+                { method: "POST", body: JSON.stringify({}) },
+            )
+            setSummary(result.message)
+            setPreview(null)
+            setIsComplete(true)
+        } catch (requestError) {
+            setError(requestError instanceof Error ? requestError.message : "Could not import the statement.")
+        } finally {
+            setIsProcessing(false)
+        }
+    }
+
+    const cancelPreview = async () => {
+        if (preview) {
+            try {
+                await requestWithAuth<void>(`${API_URL}analysis/preview/${preview.preview_id}/`, { method: "DELETE" })
+            } catch {
+                setError("Could not discard this preview. It will expire automatically in one hour.")
+                return
+            }
+        }
+        setPreview(null)
+        setFile(null)
+        setError(null)
     }
 
     if (isComplete) {
         return (
-            <Card className="border-primary/50 bg-primary/5 relative overflow-hidden">
-                <div className="absolute inset-0 bg-gradient-to-br from-primary/20 via-transparent to-transparent opacity-50 pointer-events-none" />
-                <CardContent className="flex flex-col items-center justify-center py-12 text-center relative z-10">
-                    <div className="h-16 w-16 rounded-full bg-primary/20 flex items-center justify-center mb-6">
-                        <CheckCircle2 className="h-8 w-8 text-primary" />
+            <Card className="border-primary/30 bg-white">
+                <CardContent className="flex flex-col items-center justify-center py-12 text-center">
+                    <div className="mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-emerald-50">
+                        <CheckCircle2 className="h-8 w-8 text-emerald-700" />
                     </div>
-                    <h3 className="text-2xl font-bold mb-2 text-gradient">Analysis Complete!</h3>
-                    <p className="text-muted-foreground mb-8 max-w-sm">
-                        {summary}
-                    </p>
-                    <Button variant="gradient" onClick={() => {
-                        setFile(null);
-                        setIsComplete(false);
-                        router.push('/dashboard')
-                    }}>
-                        View Dashboard
-                    </Button>
+                    <h3 className="mb-2 text-2xl font-bold text-foreground">Import complete</h3>
+                    <p className="mb-8 max-w-sm text-muted-foreground">{summary}</p>
+                    <Button onClick={() => router.push("/dashboard")}>View dashboard</Button>
                 </CardContent>
             </Card>
         )
     }
 
     return (
-        <Card className="overflow-hidden">
+        <Card className="overflow-hidden border-border bg-white">
             <CardHeader>
-                <CardTitle className="flex items-center gap-2">
+                <CardTitle className="flex items-center gap-2 text-foreground">
                     <Upload className="h-5 w-5 text-primary" />
-                    Upload Bank Statement
+                    Upload bank statement
                 </CardTitle>
                 <CardDescription>
-                    Drag and drop your CSV or PDF bank statement. Our AI will automatically categorize your expenses.
+                    Review detected transactions before they are added to your account. CSV and PDF files up to 10 MB are supported.
                 </CardDescription>
             </CardHeader>
-            <CardContent>
-                <div
-                    className={`border-2 border-dashed rounded-xl p-10 flex flex-col items-center justify-center transition-all duration-300 ${isHovering ? "border-primary bg-primary/5 scale-[1.02]" : "border-border hover:border-primary/30 hover:bg-muted/40"} ${!file && !isProcessing ? "cursor-pointer" : ""}`}
-                    onDragOver={(e) => { e.preventDefault(); setIsHovering(true); }}
-                    onDragLeave={() => setIsHovering(false)}
-                    onDrop={handleDrop}
-                    onClick={() => !file && !isProcessing && document.getElementById("file-upload")?.click()}
-                >
-                    <input
-                        id="file-upload"
-                        type="file"
-                        className="hidden"
-                        accept=".csv,.pdf"
-                        onChange={(e) => {
-                            if (e.target.files?.[0]) {
-                                setFile(e.target.files[0])
-                                setError(null)
-                            }
-                        }}
-                    />
+            <CardContent className="space-y-5">
+                {error && (
+                    <div role="alert" className="flex items-center gap-3 rounded-xl border border-red-200 bg-red-50 p-4 text-red-800">
+                        <AlertCircle className="h-5 w-5 shrink-0" />
+                        <p className="text-sm">{error}</p>
+                    </div>
+                )}
 
-                    {error && (
-                        <div className="mb-6 p-4 rounded-xl bg-red-50 border border-red-200 text-red-700 absolute top-4 left-4 right-4 flex items-center gap-3">
-                            <AlertCircle className="h-5 w-5" />
-                            <p className="text-sm">{error}</p>
-                        </div>
-                    )}
+                {!preview && (
+                    <div
+                        className={`flex min-h-64 flex-col items-center justify-center rounded-xl border-2 border-dashed p-8 transition ${isHovering ? "border-primary bg-primary/5" : "border-border hover:border-primary/40 hover:bg-muted/30"} ${!file && !isProcessing ? "cursor-pointer" : ""}`}
+                        onDragOver={event => { event.preventDefault(); setIsHovering(true) }}
+                        onDragLeave={() => setIsHovering(false)}
+                        onDrop={handleDrop}
+                        onClick={() => !file && !isProcessing && document.getElementById("file-upload")?.click()}
+                    >
+                        <input
+                            id="file-upload"
+                            type="file"
+                            className="hidden"
+                            accept=".csv,.pdf"
+                            onChange={event => chooseFile(event.target.files?.[0])}
+                        />
+                        {isProcessing ? (
+                            <div className="flex flex-col items-center gap-4">
+                                <Loader2 className="h-10 w-10 animate-spin text-primary" />
+                                <p className="text-sm font-medium text-foreground">Reading and categorizing transactions…</p>
+                            </div>
+                        ) : file ? (
+                            <div className="flex flex-col items-center gap-4 text-center">
+                                <FileText className="h-10 w-10 text-primary" />
+                                <div>
+                                    <p className="font-medium text-foreground">{file.name}</p>
+                                    <p className="text-sm text-muted-foreground">Ready to review</p>
+                                </div>
+                                <div className="flex gap-3">
+                                    <Button variant="outline" onClick={event => { event.stopPropagation(); setFile(null); setError(null) }}>
+                                        Choose another
+                                    </Button>
+                                    <Button onClick={event => { event.stopPropagation(); void handleProcess() }}>
+                                        <Sparkles className="mr-2 h-4 w-4" />
+                                        Analyze statement
+                                    </Button>
+                                </div>
+                            </div>
+                        ) : (
+                            <div className="pointer-events-none flex flex-col items-center gap-4 text-center">
+                                <div className="flex h-14 w-14 items-center justify-center rounded-full bg-muted">
+                                    <Upload className="h-7 w-7 text-muted-foreground" />
+                                </div>
+                                <div>
+                                    <p className="font-medium text-foreground">Click or drag a statement here</p>
+                                    <p className="text-sm text-muted-foreground">CSV or PDF · Maximum 10 MB</p>
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                )}
 
-                    {isProcessing ? (
-                        <div className="flex flex-col items-center space-y-4">
-                            <div className="relative">
-                                <Loader2 className="h-12 w-12 text-primary animate-spin" />
-                                <Sparkles className="h-5 w-5 text-amber-400 absolute -top-1 -right-1 animate-pulse" />
+                {preview && (
+                    <section aria-label="Transaction preview" className="space-y-4">
+                        <div className="flex flex-wrap items-center justify-between gap-3">
+                            <div>
+                                <h3 className="font-semibold text-foreground">Review {preview.filename}</h3>
+                                <p className="text-sm text-muted-foreground">
+                                    {preview.transactions.length.toLocaleString()} transactions detected. Nothing is saved until you import.
+                                </p>
                             </div>
-                            <div className="text-center">
-                                <p className="text-lg font-medium text-foreground mb-1">AI Agent Running...</p>
-                                <p className="text-sm text-muted-foreground">Categorizing your transactions intelligently</p>
-                            </div>
-                        </div>
-                    ) : file ? (
-                        <div className="flex flex-col items-center space-y-4">
-                            <div className="h-16 w-16 rounded-2xl bg-blue-50 border border-blue-100 flex items-center justify-center">
-                                <FileText className="h-8 w-8 text-blue-700" />
-                            </div>
-                            <div className="text-center">
-                                <p className="text-lg font-medium text-foreground mb-1">{file.name}</p>
-                                <p className="text-sm text-muted-foreground">Ready for AI analysis</p>
-                            </div>
-                            <div className="flex gap-3 mt-4">
-                                <Button variant="outline" onClick={(e) => { e.stopPropagation(); setFile(null); }}>
-                                    Cancel
-                                </Button>
-                                <Button variant="gradient" onClick={(e) => { e.stopPropagation(); handleProcess(); }}>
-                                    <Sparkles className="h-4 w-4 mr-2" />
-                                    Analyze with AI
+                            <div className="flex gap-2">
+                                <Button variant="outline" onClick={() => void cancelPreview()} disabled={isProcessing}>Discard</Button>
+                                <Button onClick={() => void confirmImport()} disabled={isProcessing}>
+                                    {isProcessing && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                                    Import transactions
                                 </Button>
                             </div>
                         </div>
-                    ) : (
-                        <div className="flex flex-col items-center space-y-4 pointer-events-none">
-                            <div className="h-16 w-16 rounded-full bg-muted flex items-center justify-center">
-                                <Upload className="h-8 w-8 text-muted-foreground" />
+                        {preview.warnings.length > 0 && (
+                            <div className="rounded-lg border border-amber-200 bg-amber-50 p-3 text-sm text-amber-900">
+                                <p className="mb-1 font-medium">{preview.warnings.length} row(s) need attention</p>
+                                <ul className="max-h-24 list-inside list-disc overflow-y-auto">
+                                    {preview.warnings.slice(0, 20).map((warning, index) => <li key={`${index}-${warning}`}>{warning}</li>)}
+                                </ul>
+                                {preview.warnings.length > 20 && <p className="mt-1">Showing first 20 warnings.</p>}
                             </div>
-                            <div className="text-center">
-                                <p className="text-lg font-medium text-foreground mb-1">Click or drag file to this area</p>
-                                <p className="text-sm text-muted-foreground">Supports CSV, PDF up to 10MB</p>
-                            </div>
+                        )}
+                        <div className="max-h-[28rem] overflow-auto rounded-xl border border-border">
+                            <table className="w-full min-w-[760px] text-left text-sm">
+                                <thead className="sticky top-0 bg-muted text-xs uppercase text-muted-foreground">
+                                    <tr>
+                                        <th className="px-3 py-2">Date</th>
+                                        <th className="px-3 py-2">Description</th>
+                                        <th className="px-3 py-2">Merchant</th>
+                                        <th className="px-3 py-2">Category</th>
+                                        <th className="px-3 py-2 text-right">Amount</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {preview.transactions.map(transaction => (
+                                        <tr key={transaction.index} className="border-t border-border">
+                                            <td className="whitespace-nowrap px-3 py-2 text-foreground">{transaction.date}</td>
+                                            <td className="max-w-64 truncate px-3 py-2 text-foreground" title={transaction.description}>{transaction.description}</td>
+                                            <td className="px-3 py-2 text-foreground">{transaction.merchant}</td>
+                                            <td className="px-3 py-2 text-foreground">
+                                                {transaction.category}
+                                                {transaction.is_transfer && <span className="ml-1.5 rounded-full bg-blue-50 px-2 py-0.5 text-[10px] text-blue-800">Transfer</span>}
+                                            </td>
+                                            <td className={`whitespace-nowrap px-3 py-2 text-right font-medium ${Number(transaction.amount) < 0 ? "text-red-700" : "text-emerald-700"}`}>
+                                                {Number(transaction.amount) < 0 ? "−" : "+"}₦{Math.abs(Number(transaction.amount)).toLocaleString("en-NG", { minimumFractionDigits: 2 })}
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
                         </div>
-                    )}
-                </div>
+                    </section>
+                )}
             </CardContent>
         </Card>
     )
