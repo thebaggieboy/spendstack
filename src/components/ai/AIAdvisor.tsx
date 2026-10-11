@@ -1,12 +1,18 @@
 "use client"
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/Card"
-import { BrainCircuit, Sparkles, TrendingDown, AlertTriangle, ArrowRight, CheckCircle2 } from "lucide-react"
+import { BrainCircuit, Sparkles, AlertTriangle, ArrowRight, CheckCircle2 } from "lucide-react"
 import useSWR from 'swr'
 import { fetchWithAuth as fetcher } from '@/lib/fetcher';
 
+type Insight = {
+    type: string
+    title: string
+    message: string
+}
+
 export default function AIAdvisor() {
-    const { data: insights, error, isLoading } = useSWR(`${process.env.NEXT_PUBLIC_API_URL}dashboard/advisor/`, fetcher)
+    const { data: insights, error, isLoading } = useSWR<Insight[]>(`${process.env.NEXT_PUBLIC_API_URL}dashboard/advisor/`, fetcher)
 
     if (isLoading) {
         return (
@@ -39,7 +45,7 @@ export default function AIAdvisor() {
             </CardHeader>
             <CardContent className="space-y-4">
 
-                {insights.map((insight: any, i: number) => {
+                {insights.map((insight, i) => {
                     const isAlert = insight.type === 'alert'
                     const Icon = isAlert ? AlertTriangle : CheckCircle2
                     const iconClass = isAlert ? 'text-amber-600' : 'text-emerald-700'

@@ -5,7 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Calculator, TrendingDown, Wallet, Percent, Info, ChevronDown, ChevronUp } from "lucide-react"
 import {
     PieChart, Pie, Cell, Tooltip, ResponsiveContainer, Legend,
-    BarChart, Bar, XAxis, YAxis, CartesianGrid, TooltipProps
+    BarChart, Bar, XAxis, YAxis, CartesianGrid
 } from "recharts"
 
 // ============================================================
@@ -29,6 +29,11 @@ function formatNaira(n: number) {
 
 function formatFull(n: number) {
     return `₦${n.toLocaleString("en-NG", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+}
+
+function parseAmount(value: string) {
+    const amount = Number(value)
+    return Number.isFinite(amount) ? Math.max(0, amount) : 0
 }
 
 interface TaxBreakdown {
@@ -115,13 +120,23 @@ function calculateTax(
     }
 }
 
-const CustomTooltip = ({ active, payload, label }: any) => {
+type TooltipItem = { color?: string; fill?: string; name?: string; value?: number }
+
+const CustomTooltip = ({
+    active,
+    payload,
+    label,
+}: {
+    active?: boolean
+    payload?: TooltipItem[]
+    label?: string | number
+}) => {
     if (active && payload && payload.length) {
         return (
             <div className="bg-white border border-border rounded-xl p-3 text-sm shadow-xl">
                 <p className="font-semibold text-foreground mb-1">{label || payload[0]?.name}</p>
-                {payload.map((p: any, i: number) => (
-                    <p key={i} style={{ color: p.color || p.fill }}>{p.name}: {formatFull(p.value)}</p>
+                {payload.map((p, i) => (
+                    <p key={i} style={{ color: p.color || p.fill }}>{p.name}: {formatFull(Number(p.value ?? 0))}</p>
                 ))}
             </div>
         )
@@ -181,6 +196,13 @@ export default function TaxPage() {
         { label: "Effective Tax Rate", value: `${result.effectiveRate.toFixed(2)}%`, sub: "of gross income", color: "from-purple-50 to-indigo-50", border: "border-purple-200", icon: Percent, iconColor: "text-purple-700" },
         { label: "Chargeable Income", value: formatFull(result.chargeableIncome / divisor), sub: "after deductions", color: "from-blue-50 to-cyan-50", border: "border-blue-200", icon: Calculator, iconColor: "text-blue-700" },
     ]
+    const deductionFields = [
+        { id: "pension", label: "Employee pension contributions", value: pensionDeduction, onChange: setPensionDeduction },
+        { id: "nhf", label: "National Housing Fund (NHF)", value: nhfDeduction, onChange: setNhfDeduction },
+        { id: "nhis", label: "National Health Insurance (NHIS)", value: nhisDeduction, onChange: setNhisDeduction },
+        { id: "life-insurance", label: "Qualifying life insurance premiums", value: lifeInsuranceDeduction, onChange: setLifeInsuranceDeduction },
+        { id: "mortgage-interest", label: "Owner-occupied home loan interest", value: mortgageInterestDeduction, onChange: setMortgageInterestDeduction },
+    ]
 
     return (
         <div className="flex-1 space-y-6 p-6 overflow-auto">
@@ -238,13 +260,13 @@ export default function TaxPage() {
                         </CardHeader>
                         <CardContent className="space-y-5">
                             <div>
-                                <label className="text-sm font-medium text-foreground mb-2 block">Annual Gross Income</label>
+                                <label className="text-sm font-medium text-foreground mb-2 block">Annual Gross Employment Income</label>
                                 <div className="relative">
                                     <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground font-bold text-lg">₦</span>
                                     <input
                                         type="number"
                                         value={grossIncome}
-                                        onChange={e => setGrossIncome(Math.max(0, Number(e.target.value)))}
+                                        onChange={e => setGrossIncome(parseAmount(e.target.value))}
                                         className="w-full bg-white border border-input rounded-xl py-3 pl-9 pr-4 text-foreground text-lg font-semibold focus:outline-none focus:ring-2 focus:ring-primary/30"
                                     />
                                 </div>
@@ -262,36 +284,39 @@ export default function TaxPage() {
 
                             {/* Deductions */}
                             <div className="space-y-3 pt-2 border-t border-border">
-                                <p className="text-sm font-medium text-foreground">Allowable Deductions</p>
+                                <p className="text-sm font-medium text-foreground">Eligible annual deductions</p>
+                                <p className="text-xs text-muted-foreground">
+                                    Enter the actual amounts shown in your records. No deduction is estimated as a percentage of gross income.
+                                </p>
+                                {deductionFields.map(field => (
+                                    <label key={field.id} htmlFor={`deduction-${field.id}`} className="block space-y-1.5">
+                                        <span className="text-xs font-medium text-foreground">{field.label}</span>
+                                        <div className="relative">
+                                            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground font-semibold">₦</span>
+                                            <input
+                                                id={`deduction-${field.id}`}
+                                                type="number"
+                                                min={0}
+                                                step="any"
+                                                value={field.value}
+                                                onChange={event => field.onChange(parseAmount(event.target.value))}
+                                                className="w-full rounded-lg border border-input bg-white py-2 pl-8 pr-3 text-sm text-foreground focus:outline-none focus:ring-1 focus:ring-primary/30"
+                                            />
+                                        </div>
+                                    </label>
+                                ))}
 
-                                <label className="flex items-center justify-between cursor-pointer group">
-                                    <div>
-                                        <p className="text-sm text-foreground group-hover:text-primary transition-colors">Pension (8% of gross)</p>
-                                        <p className="text-xs text-muted-foreground">Mandatory: ₦{(grossIncome * 0.08).toLocaleString()}</p>
-                                    </div>
-                                    <div onClick={() => setIncludePension(!includePension)} className={`relative w-11 h-6 rounded-full transition-colors ${includePension ? "bg-primary" : "bg-slate-300"}`}>
-                                        <div className={`absolute top-1 w-4 h-4 bg-white rounded-full shadow transition-all ${includePension ? "left-6" : "left-1"}`} />
-                                    </div>
-                                </label>
-
-                                <label className="flex items-center justify-between cursor-pointer group">
-                                    <div>
-                                        <p className="text-sm text-foreground group-hover:text-primary transition-colors">NHF (2.5% of gross)</p>
-                                        <p className="text-xs text-muted-foreground">National Housing Fund: ₦{(grossIncome * 0.025).toLocaleString()}</p>
-                                    </div>
-                                    <div onClick={() => setIncludeNhf(!includeNhf)} className={`relative w-11 h-6 rounded-full transition-colors ${includeNhf ? "bg-primary" : "bg-slate-300"}`}>
-                                        <div className={`absolute top-1 w-4 h-4 bg-white rounded-full shadow transition-all ${includeNhf ? "left-6" : "left-1"}`} />
-                                    </div>
-                                </label>
-
-                                <label className="flex items-center justify-between cursor-pointer group">
-                                    <div>
-                                        <p className="text-sm text-foreground group-hover:text-primary transition-colors">Rent Relief (20%, max ₦500k)</p>
-                                        <p className="text-xs text-muted-foreground">For rent-paying employees</p>
-                                    </div>
-                                    <div onClick={() => setIncludeRentRelief(!includeRentRelief)} className={`relative w-11 h-6 rounded-full transition-colors ${includeRentRelief ? "bg-primary" : "bg-slate-300"}`}>
-                                        <div className={`absolute top-1 w-4 h-4 bg-white rounded-full shadow transition-all ${includeRentRelief ? "left-6" : "left-1"}`} />
-                                    </div>
+                                <label className="flex items-start gap-2 pt-2 text-sm text-foreground">
+                                    <input
+                                        type="checkbox"
+                                        checked={includeRentRelief}
+                                        onChange={event => setIncludeRentRelief(event.target.checked)}
+                                        className="mt-0.5 accent-primary"
+                                    />
+                                    <span>
+                                        Claim rent relief
+                                        <span className="block text-xs text-muted-foreground">20% of annual rent paid, capped at ₦500,000</span>
+                                    </span>
                                 </label>
 
                                 {includeRentRelief && (
@@ -302,7 +327,7 @@ export default function TaxPage() {
                                             <input
                                                 type="number"
                                                 value={annualRent}
-                                                onChange={e => setAnnualRent(Math.max(0, Number(e.target.value)))}
+                                                onChange={e => setAnnualRent(parseAmount(e.target.value))}
                                                 className="w-full bg-white border border-input rounded-lg py-2 pl-8 pr-3 text-sm text-foreground focus:outline-none focus:ring-1 focus:ring-primary/30"
                                             />
                                         </div>
@@ -406,7 +431,7 @@ export default function TaxPage() {
                                 ))}
                                 {result.totalDeductions > 0 && (
                                     <tr className="border-b border-border text-xs text-muted-foreground">
-                                        <td colSpan={3} className="py-2 pr-4 italic">Total Deductions (Pension + NHF + Rent Relief)</td>
+                                        <td colSpan={3} className="py-2 pr-4 italic">Total allowable deductions applied</td>
                                         <td className="text-right py-2 font-mono text-amber-700">{formatFull(result.totalDeductions / divisor)}</td>
                                     </tr>
                                 )}
@@ -419,7 +444,7 @@ export default function TaxPage() {
                         </table>
                     </div>
                     <p className="text-xs text-muted-foreground mt-4">
-                        * Calculations based on the Nigeria Tax Act 2025 (NTA 2025), effective January 1, 2026. This is an estimate and does not constitute professional tax advice.
+                        Estimates assume Nigerian individual employment income under the Nigeria Tax Act 2025, effective January 1, 2026. They use the eligible deductions entered above; eligibility and actual PAYE may vary with your circumstances and supporting documents. Confirm your assessment with your State Internal Revenue Service or a qualified tax professional.
                     </p>
                 </CardContent>
             </Card>

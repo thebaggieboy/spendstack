@@ -1,7 +1,7 @@
 "use client"
 
 import { Card, CardContent } from "@/components/ui/Card"
-import { Wallet, TrendingUp, TrendingDown, Target, Loader2, PiggyBank } from 'lucide-react';
+import { Wallet, TrendingUp, TrendingDown, PiggyBank } from 'lucide-react';
 import useSWR from 'swr'
 import { fetchWithAuth as fetcher } from '@/lib/fetcher';
 import { formatNaira } from '@/lib/utils';

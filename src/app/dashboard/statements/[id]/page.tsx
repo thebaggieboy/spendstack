@@ -16,13 +16,51 @@ import {
 import { useState } from "react"
 import Link from "next/link"
 
-const CustomTooltip = ({ active, payload, label }: any) => {
+type StatementTransaction = {
+    id: number
+    date: string
+    date_display: string
+    raw_description: string
+    merchant_name: string
+    amount: number
+    category: string
+    category_color: string
+    running_balance: number
+    is_transfer: boolean
+}
+
+type StatementDetail = {
+    filename: string
+    upload_date: string
+    stats: {
+        total_income: number
+        total_expenses: number
+        net: number
+        transaction_count: number
+        merchant_count: number
+    }
+    transactions: StatementTransaction[]
+    category_breakdown: { name: string; value: number; color: string }[]
+    daily_data: { date: string; income: number; expenses: number }[]
+}
+
+type TooltipItem = { color?: string; stroke?: string; name?: string; value?: number }
+
+const CustomTooltip = ({
+    active,
+    payload,
+    label,
+}: {
+    active?: boolean
+    payload?: TooltipItem[]
+    label?: string | number
+}) => {
     if (active && payload && payload.length) {
         return (
             <div className="bg-white border border-border rounded-xl p-3 text-sm shadow-lg">
                 <p className="font-semibold text-foreground mb-1">{label}</p>
-                {payload.map((p: any, i: number) => (
-                    <p key={i} style={{ color: p.color || p.stroke }}>{p.name}: {formatNaira(Math.abs(p.value))}</p>
+                {payload.map((p, i) => (
+                    <p key={i} style={{ color: p.color || p.stroke }}>{p.name}: {formatNaira(Math.abs(Number(p.value ?? 0)))}</p>
                 ))}
             </div>
         )
@@ -35,7 +73,7 @@ export default function StatementDetailPage() {
     const router = useRouter()
     const [search, setSearch] = useState("")
 
-    const { data, isLoading, error } = useSWR(
+    const { data, isLoading, error } = useSWR<StatementDetail>(
         `${process.env.NEXT_PUBLIC_API_URL}analysis/statements/${id}/`,
         fetcher
     )
@@ -62,13 +100,13 @@ export default function StatementDetailPage() {
 
     const { filename, upload_date, stats, transactions, category_breakdown, daily_data } = data
 
-    const filteredTx = transactions?.filter((tx: any) =>
+    const filteredTx = transactions?.filter(tx =>
         tx.merchant_name?.toLowerCase().includes(search.toLowerCase()) ||
         tx.raw_description?.toLowerCase().includes(search.toLowerCase()) ||
         tx.category?.toLowerCase().includes(search.toLowerCase())
     ) ?? []
 
-    const balanceData = transactions?.map((tx: any) => ({
+    const balanceData = transactions?.map(tx => ({
         date: tx.date_display,
         "Balance": tx.running_balance,
     })) ?? []
@@ -167,12 +205,12 @@ export default function StatementDetailPage() {
                                         innerRadius={50} outerRadius={75}
                                         dataKey="value" paddingAngle={3}
                                     >
-                                        {category_breakdown.map((c: any, i: number) => (
+                                        {category_breakdown.map((c, i) => (
                                             <Cell key={i} fill={c.color} />
                                         ))}
                                     </Pie>
                                     <Tooltip
-                                        formatter={(v: any) => formatNaira(v)}
+                                        formatter={value => formatNaira(Number(value ?? 0))}
                                         contentStyle={{ background: "#ffffff", color: "#18181b", border: "1px solid #e4e4e7", borderRadius: "12px", fontSize: "12px" }}
                                     />
                                     <Legend iconType="circle" iconSize={8} wrapperStyle={{ fontSize: "11px" }} />
@@ -241,7 +279,7 @@ export default function StatementDetailPage() {
                                 {filteredTx.length === 0 ? (
                                     <div className="text-center text-sm text-muted-foreground py-10">No results found</div>
                                 ) : (
-                                    filteredTx.map((tx: any) => (
+                                    filteredTx.map(tx => (
                                         <div key={tx.id} className="grid grid-cols-12 gap-3 items-center px-4 py-3 hover:bg-muted/50 transition-colors rounded-xl group">
                                             <div className="col-span-5 flex items-center gap-3 min-w-0">
                                                 <div className={`p-2 rounded-lg flex-shrink-0 ${tx.amount > 0 ? "bg-emerald-50" : "bg-rose-50"}`}>

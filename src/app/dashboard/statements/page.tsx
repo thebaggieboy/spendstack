@@ -6,8 +6,15 @@ import useSWR from "swr"
 import { fetchWithAuth as fetcher } from '@/lib/fetcher';
 import Link from "next/link";
 
+type StatementSummary = {
+    id: number
+    filename: string
+    upload_date: string
+    transaction_count: number
+}
+
 export default function StatementsPage() {
-    const { data: statements, isLoading, error } = useSWR(`${process.env.NEXT_PUBLIC_API_URL}analysis/statements/`, fetcher)
+    const { data: statements, isLoading, error } = useSWR<StatementSummary[]>(`${process.env.NEXT_PUBLIC_API_URL}analysis/statements/`, fetcher)
 
     return (
         <div className="space-y-6">
@@ -57,7 +64,7 @@ export default function StatementsPage() {
                         </div>
                     ) : (
                         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                            {statements.map((stmt: any) => (
+                            {statements.map(stmt => (
                                 <Link key={stmt.id} href={`/dashboard/statements/${stmt.id}`}>
                                     <div className="group relative overflow-hidden rounded-2xl bg-white border border-border p-6 hover:bg-muted/50 transition-all hover:scale-[1.02] cursor-pointer">
                                         <div className="flex justify-between items-start mb-4">

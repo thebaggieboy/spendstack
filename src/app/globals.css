@@ -100,3 +100,12 @@
     @apply bg-clip-text text-transparent bg-gradient-to-r from-primary to-purple-400;
   }
 }
+
+.tracking-tighter,
+.tracking-tight,
+.tracking-normal,
+.tracking-wide,
+.tracking-wider,
+.tracking-widest {
+  letter-spacing: 1px;
+}

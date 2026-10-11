@@ -1,6 +1,7 @@
 "use client"
 
 import AIAdvisor from "@/components/ai/AIAdvisor"
+import Link from "next/link"
 
 export default function AdvisorPage() {
     return (
@@ -28,17 +29,15 @@ export default function AdvisorPage() {
                     <p className="text-muted-foreground mx-auto max-w-lg mb-6">
                         Want deeper analysis? Chat directly with your financial data to find hidden trends or ask specific questions about your spending.
                     </p>
-                    <div className="relative max-w-2xl mx-auto">
-                        <input
-                            disabled
-                            placeholder="e.g. How much did I spend on food last month compared to this month?"
-                            className="w-full flex h-12 rounded-full border border-input bg-white px-6 py-2 text-sm text-foreground ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60 pr-12"
-                        />
-                        <button disabled className="absolute right-2 top-2 h-8 w-8 bg-primary text-primary-foreground rounded-full flex items-center justify-center opacity-50 cursor-not-allowed">
-                            <svg className="h-4 w-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" /></svg>
-                        </button>
-                    </div>
-                    <p className="text-xs text-muted-foreground mt-4 uppercase tracking-widest font-semibold">Coming Soon</p>
+                    <Link
+                        href="/dashboard/chat"
+                        className="inline-flex items-center gap-2 rounded-xl bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground transition hover:bg-primary/90"
+                    >
+                        <span>Start a statement chat</span>
+                        <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+                        </svg>
+                    </Link>
                 </div>
             </div>
         </div>
