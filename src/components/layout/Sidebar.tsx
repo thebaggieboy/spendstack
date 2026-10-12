@@ -25,7 +25,7 @@ import { useAuth } from "@/contexts/AuthContext"
 const routes = [
     { label: "Dashboard",        icon: LayoutDashboard, href: "/dashboard",              color: "text-primary" },
     { label: "Tools",            icon: Wrench,          href: "/dashboard/tools",        color: "text-primary" },
-    { label: "Billing",          icon: CreditCard,      href: "/dashboard/billing",      color: "text-primary" },
+
     //{ label: "Upload Statement", icon: Upload,           href: "/upload",                color: "text-emerald-500" },
     { label: "Statements",       icon: FileText,         href: "/dashboard/statements",  color: "text-indigo-400" },
     { label: "Transactions",     icon: ArrowRightLeft,   href: "/dashboard/transactions",color: "text-blue-500" },
@@ -36,8 +36,7 @@ const routes = [
    // { label: "Budgets",          icon: Wallet,           href: "/dashboard/budgets",     color: "text-pink-500" },
     { label: "AI Advisor",       icon: BrainCircuit,     href: "/dashboard/advisor",     color: "text-amber-500" },
    // { label: "Settings",         icon: Settings,         href: "/dashboard/settings",    color: "text-gray-500" },
-    { label: "Settings",         icon: Settings2,        href: "/dashboard/settings",    color: "text-primary" },
-    { label: "Profile",          icon: UserRound,        href: "/dashboard/profile",     color: "text-primary" },
+
     { label: "Admin analytics",  icon: ShieldCheck,      href: "/admin/analytics",       color: "text-primary", adminOnly: true },
 ]
 
@@ -53,7 +52,7 @@ function NavLinks({ onNavigate }: { onNavigate?: () => void }) {
                     href={route.href}
                     onClick={onNavigate}
                     className={cn(
-                        "text-sm group flex p-3 w-full justify-start font-medium cursor-pointer hover:text-foreground hover:bg-muted rounded-lg transition-all duration-150",
+                        "text-xs group flex p-3 w-full justify-start font-medium cursor-pointer hover:text-foreground hover:bg-muted rounded-lg transition-all duration-150",
                         pathname === route.href ? "bg-primary/10 text-primary" : "text-muted-foreground"
                     )}
                 >

@@ -9,6 +9,9 @@ import { requestWithAuth } from "@/lib/fetcher"
 
 type PreviewTransaction = {
     index: number
+    source_row?: number
+    source_sheet?: string
+    source_page?: number
     date: string
     description: string
     merchant: string
@@ -207,15 +210,18 @@ export default function StatementUploader() {
                             </div>
                             <div className="flex gap-2">
                                 <Button variant="outline" onClick={() => void cancelPreview()} disabled={isProcessing}>Discard</Button>
-                                <Button onClick={() => void confirmImport()} disabled={isProcessing}>
+                                <Button onClick={() => void confirmImport()} disabled={isProcessing || preview.warnings.length > 0}>
                                     {isProcessing && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                                     Import transactions
                                 </Button>
                             </div>
                         </div>
                         {preview.warnings.length > 0 && (
-                            <div className="rounded-lg border border-amber-200 bg-amber-50 p-3 text-sm text-amber-900">
+                            <div role="alert" className="rounded-lg border border-amber-200 bg-amber-50 p-3 text-sm text-amber-900">
                                 <p className="mb-1 font-medium">{preview.warnings.length} row(s) need attention</p>
+                                <p className="mb-2">
+                                    Import is blocked to prevent partial or inaccurate data. Correct the statement and upload it again.
+                                </p>
                                 <ul className="max-h-24 list-inside list-disc overflow-y-auto">
                                     {preview.warnings.slice(0, 20).map((warning, index) => <li key={`${index}-${warning}`}>{warning}</li>)}
                                 </ul>
@@ -223,9 +229,10 @@ export default function StatementUploader() {
                             </div>
                         )}
                         <div className="max-h-[28rem] overflow-auto rounded-xl border border-border">
-                            <table className="w-full min-w-[760px] text-left text-sm">
+                            <table className="w-full min-w-[860px] text-left text-sm">
                                 <thead className="sticky top-0 bg-muted text-xs uppercase text-muted-foreground">
                                     <tr>
+                                        <th className="px-3 py-2">Source</th>
                                         <th className="px-3 py-2">Date</th>
                                         <th className="px-3 py-2">Description</th>
                                         <th className="px-3 py-2">Merchant</th>
@@ -236,6 +243,15 @@ export default function StatementUploader() {
                                 <tbody>
                                     {preview.transactions.map(transaction => (
                                         <tr key={transaction.index} className="border-t border-border">
+                                            <td className="whitespace-nowrap px-3 py-2 text-muted-foreground">
+                                                {transaction.source_sheet
+                                                    ? `${transaction.source_sheet} · row ${transaction.source_row}`
+                                                    : transaction.source_page
+                                                        ? `PDF page ${transaction.source_page} · line ${transaction.source_row}`
+                                                        : transaction.source_row
+                                                            ? `Row ${transaction.source_row}`
+                                                            : "—"}
+                                            </td>
                                             <td className="whitespace-nowrap px-3 py-2 text-foreground">{transaction.date}</td>
                                             <td className="max-w-64 truncate px-3 py-2 text-foreground" title={transaction.description}>{transaction.description}</td>
                                             <td className="px-3 py-2 text-foreground">{transaction.merchant}</td>

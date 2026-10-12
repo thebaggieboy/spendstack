@@ -20,7 +20,7 @@ function AIAdvisorContent() {
             <Card className="col-span-1 lg:col-span-2 bg-primary/[0.03] border-primary/15 h-[400px] flex items-center justify-center">
                 <div className="flex flex-col items-center animate-pulse text-primary/60">
                     <BrainCircuit className="h-10 w-10 mb-4 animate-spin-slow text-primary" />
-                    <p>AI is analyzing your spending patterns...</p>
+                    <p>Preparing your spending summary...</p>
                 </div>
             </Card>
         )
@@ -29,7 +29,7 @@ function AIAdvisorContent() {
     if (error || !insights || insights.length === 0) {
         return (
             <Card className="col-span-1 lg:col-span-2 bg-primary/[0.03] border-primary/15 h-[400px] flex items-center justify-center text-muted-foreground p-6 text-center">
-                <p>Upload a bank statement to receive personalized AI advice.</p>
+                <p>Upload a bank statement to receive a summary of your recent spending.</p>
             </Card>
         )
     }
@@ -40,7 +40,7 @@ function AIAdvisorContent() {
             <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-primary text-xl">
                     <BrainCircuit className="h-6 w-6" />
-                    Spendstack AI
+                    Spendstack Insights
                 </CardTitle>
                 <CardDescription className="text-primary/70">Personalized insights based on your spending</CardDescription>
             </CardHeader>

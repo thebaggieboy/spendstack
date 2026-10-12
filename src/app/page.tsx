@@ -1,5 +1,6 @@
 import Link from "next/link"
 import {
+    ArrowDown,
     ArrowRight,
     ArrowRightLeft,
     BarChart3,
@@ -96,15 +97,14 @@ export default function LandingPage() {
                         </p>
 
                         <div className="flex flex-col items-stretch gap-2.5 min-[420px]:flex-row min-[420px]:items-center sm:gap-3">
-                            <Link href="/signup" className="w-full min-[420px]:w-auto">
-                                <Button style={{border:0}} size="lg" className="h-11 w-full br-0 px-5 text-xs font-bold sm:h-12 sm:w-auto sm:px-7">
-                                    Get Started Free
-                                    <ArrowRight className="ml-2 h-4 w-4" />
-                                </Button>
-                            </Link>
+                        
+                              <a href="/signup" className="inline-flex h-11 w-full items-center justify-center gap-2 text-white border border-border bg-primary px-5 text-xs font-medium text-foreground transition  min-[420px]:w-auto sm:h-12 sm:px-6">
+                               Create a free accunt
+                             
+                            </a>
                             <a href="#features" className="inline-flex h-11 w-full items-center justify-center gap-2  border border-border bg-white px-5 text-xs font-medium text-foreground transition hover:bg-muted min-[420px]:w-auto sm:h-12 sm:px-6">
                                 Explore what you can do
-                                <ArrowRight className="h-4 w-4" />
+                                <ArrowDown className="h-4 w-4 primary-button" />
                             </a>
                         </div>
 
@@ -180,18 +180,18 @@ export default function LandingPage() {
                                     <span className="flex h-10 w-10 items-center justify-center rounded-xl border border-primary/10 bg-primary/5 text-primary">
                                         <Icon className="h-5 w-5" />
                                     </span>
-                                    <span className="rounded-full bg-slate-50 px-2.5 py-1 text-[10px] font-medium text-muted-foreground">{detail}</span>
+                                    <span className="rounded-full  px-2.5 py-1 text-[10px] font-medium text-amber-50">{detail}</span>
                                 </div>
-                                <h3 className="mt-4 text-sm font-semibold text-foreground sm:text-base">{title}</h3>
-                                <p className="mt-2 text-xs leading-relaxed text-muted-foreground sm:text-sm">{description}</p>
+                                <h3 className="mt-4 text-sm font-semibold text-foreground sm:text-base text-white">{title}</h3>
+                                <p className="mt-2 text-xs leading-relaxed sm:text-xs text-gray-200">{description}</p>
                                 </>
                             )
                             return href ? (
-                                <Link key={title} href={href} className="rounded-2xl border border-border bg-white p-4 shadow-sm transition hover:-translate-y-0.5 hover:border-primary/30 hover:shadow-md sm:p-5">
+                                <Link key={title} href={href} className="rounded-2xl p-4 shadow-sm transition hover:-translate-y-0.5 hover:border-primary/30 hover:shadow-md sm:p-5">
                                     {content}
                                 </Link>
                             ) : (
-                                <article key={title} className="rounded-2xl border border-border bg-white p-4 shadow-sm sm:p-5">
+                                <article key={title} className="rounded-2xl p-4 shadow-sm sm:p-5">
                                     {content}
                                 </article>
                             )
