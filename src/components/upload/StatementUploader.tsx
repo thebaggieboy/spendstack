@@ -46,6 +46,12 @@ export default function StatementUploader() {
             setError("Choose a CSV, Excel, or PDF statement.")
             return
         }
+        if (candidate.size === 0) {
+            setFile(null)
+            setPreview(null)
+            setError("This file is empty (0 bytes), so it contains no statement data. Download it again and verify it is non-empty before uploading.")
+            return
+        }
         if (candidate.size > MAX_FILE_SIZE) {
             setError("Statement files must be 10 MB or smaller.")
             return

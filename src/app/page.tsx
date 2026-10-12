@@ -82,10 +82,7 @@ export default function LandingPage() {
             <section className="mx-auto w-full max-w-6xl px-4 pb-14 pt-14 sm:px-6 sm:pb-16 sm:pt-20 lg:px-10 lg:pb-20 lg:pt-24">
                 <div className="grid items-center gap-10 sm:gap-12 lg:grid-cols-[1.05fr_0.95fr] lg:gap-16">
                     <div>
-                        <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-primary/15 bg-primary/5 px-3 py-1.5 text-[11px] font-small text-primary sm:mb-6 sm:px-3.5 sm:py-2 sm:text-xs">
-
-                            Your intelligent financial copilot
-                        </div>
+                      
 
                         <h1 className="mb-5 text-4xl font-semibold leading-[1.05] tracking-tight text-foreground sm:mb-6 sm:text-5xl md:text-6xl xl:text-7xl">
                             Make every<br />
@@ -162,7 +159,7 @@ export default function LandingPage() {
                 </div>
             </section>
 
-            <section id="features" className="w-full scroll-mt-20 border-y border-primary bg-primary px-4 py-14 sm:px-6 sm:py-16 lg:py-20">
+            <section id="features" className="w-full scroll-mt-20 border-y border-primary bg-primary py-14 sm:-mx-6 sm:w-[calc(100%_+_3rem)] sm:px-6 sm:py-16 lg:py-20">
                 <div className="mx-auto max-w-6xl">
                     <div className="mb-8 max-w-2xl sm:mb-10">
                         <p className="mb-2 text-[11px] font-semibold uppercase tracking-widest text-white/80 sm:text-xs">One place for your money</p>
