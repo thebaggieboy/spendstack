@@ -3,5 +3,5 @@ export default function DashboardLayout({
 }: Readonly<{
     children: React.ReactNode;
 }>) {
-    return <div className="dashboard-typography">{children}</div>
+    return <div className="dashboard-typography dashboard-layout">{children}</div>
 }

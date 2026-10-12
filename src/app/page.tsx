@@ -159,7 +159,7 @@ export default function LandingPage() {
                 </div>
             </section>
 
-            <section id="features" className="w-full scroll-mt-20 border-y border-primary bg-primary py-14 sm:-mx-6 sm:w-[calc(100%_+_3rem)] sm:px-6 sm:py-16 lg:py-20">
+            <section id="features" className="w-full scroll-mt-20 border-y border-primary bg-primary py-14 sm:-mx-6 sm:w-[calc(100%_+_3rem)] sm:px-6 sm:p-5 sm:py-16 lg:py-20 p-10 100vh">
                 <div className="mx-auto max-w-6xl">
                     <div className="mb-8 max-w-2xl sm:mb-10">
                         <p className="mb-2 text-[11px] font-semibold uppercase tracking-widest text-white/80 sm:text-xs">One place for your money</p>
@@ -174,7 +174,7 @@ export default function LandingPage() {
                             const content = (
                                 <>
                                 <div className="flex items-center justify-between gap-3">
-                                    <span className="flex h-10 w-10 items-center justify-center rounded-xl border border-primary/10 bg-primary/5 text-primary">
+                                    <span className="flex h-10 w-10 items-center justify-center  bg-primary/5 text-primary">
                                         <Icon className="h-5 w-5" />
                                     </span>
                                     <span className="rounded-full  px-2.5 py-1 text-[10px] font-medium text-amber-50">{detail}</span>
@@ -195,7 +195,7 @@ export default function LandingPage() {
                         })}
                     </div>
 
-                    <div id="how-it-works" className="mt-8 scroll-mt-20 rounded-2xl border border-white/70 bg-white p-4 shadow-lg shadow-black/10 sm:mt-10 sm:p-6">
+                    <div id="how-it-works" className="mt-8 scroll-mt-20 border border-white/70 bg-white p-4 shadow-lg shadow-black/10 sm:mt-10 sm:p-6">
                         <div className="mb-5 flex flex-col gap-1 sm:mb-6 sm:flex-row sm:items-end sm:justify-between">
                             <h3 className="text-base font-semibold text-foreground">Simple by design</h3>
                             <p className="text-xs text-muted-foreground sm:text-sm">Your records first. Useful actions next.</p>

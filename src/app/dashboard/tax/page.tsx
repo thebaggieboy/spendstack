@@ -231,7 +231,7 @@ export default function TaxPage() {
     ]
 
     return (
-        <div className="flex-1 space-y-6 p-6 overflow-auto">
+        <div className="min-w-0 space-y-6 py-4 sm:py-6">
             {/* Header */}
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                 <div>

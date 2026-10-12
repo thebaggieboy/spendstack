@@ -99,7 +99,7 @@ function StatementChatContent() {
     }
 
     return (
-        <div className="mx-auto flex w-full max-w-5xl flex-1 flex-col gap-6 p-4 sm:p-6">
+        <div className="mx-auto flex w-full min-w-0 max-w-5xl flex-1 flex-col gap-6 py-4 sm:py-6">
             <div>
                 <div className="mb-2 flex items-center gap-2 text-primary">
                     <MessageCircle className="h-5 w-5" />

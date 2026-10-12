@@ -5,7 +5,7 @@ import Link from "next/link"
 
 export default function AdvisorPage() {
     return (
-        <div className="flex-1 space-y-6 p-8 pt-6 overflow-auto">
+        <div className="min-w-0 space-y-6 py-4 sm:py-6">
             <div className="flex items-center justify-between space-y-2">
                 <div>
                     <h2 className="text-3xl font-bold tracking-tight text-foreground">AI Financial Advisor</h2>
