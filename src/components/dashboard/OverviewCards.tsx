@@ -10,7 +10,7 @@ export default function OverviewCards() {
     const { data, error, isLoading } = useSWR(`${process.env.NEXT_PUBLIC_API_URL}dashboard/overview/`, fetcher)
 
     if (isLoading) {
-        return <div className="animate-pulse h-32 bg-muted rounded-2xl w-full"></div>
+        return         <div className="animate-pulse h-32 bg-muted w-full"></div>
     }
 
     if (error || !data) {
@@ -19,18 +19,18 @@ export default function OverviewCards() {
 
     const stats = [
         {
-            title: "Total Balance",
-            value: formatNaira(data.total_balance),
-            change: "Overall",
+            title: "Net Cash Flow",
+            value: formatNaira(data.net_cash_flow),
+            change: "Recorded credits less spending",
             trend: "neutral",
             icon: Wallet,
             color: "from-blue-500 to-cyan-400",
             iconColor: "text-blue-500"
         },
         {
-            title: "Total Income",
-            value: formatNaira(data.income_all_time),
-            change: "All Time",
+            title: "Total Credits",
+            value: formatNaira(data.credits_all_time),
+            change: "All-time posted credits",
             trend: "up",
             icon: TrendingUp,
             color: "from-emerald-400 to-green-500",
@@ -46,9 +46,9 @@ export default function OverviewCards() {
             iconColor: "text-rose-500"
         },
         {
-            title: "Savings Rate",
+            title: "Net Cash-Flow Rate",
             value: `${data.savings_rate.toFixed(1)}%`,
-            change: "Overall",
+            change: "Net cash flow ÷ credits",
             trend: "neutral",
             icon: PiggyBank,
             color: "from-purple-500 to-pink-500",
@@ -80,7 +80,7 @@ export default function OverviewCards() {
                 <Card key={stat.title} className="group">
                     <CardContent className="p-6">
                         <div className="flex justify-between items-start mb-4">
-                            <p className="text-sm font-medium text-muted-foreground whitespace-nowrap">
+                            <p className="text-sm font-medium text-muted-foreground">
                                 {stat.title}
                             </p>
                             <div className={`p-2.5 rounded-xl bg-muted border border-border ${stat.iconColor}`}>

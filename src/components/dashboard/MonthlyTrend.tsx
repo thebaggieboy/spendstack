@@ -48,7 +48,7 @@ const CustomTooltip = ({ active, payload, label }: any) => {
         >
             <p className="font-semibold text-foreground mb-2">{label}</p>
             <p className="flex justify-between gap-6">
-                <span className="text-muted-foreground">Income</span>
+                <span className="text-muted-foreground">Credits</span>
                 <span className="text-emerald-400 font-medium">{formatNaira(income)}</span>
             </p>
             <p className="flex justify-between gap-6">
@@ -109,14 +109,14 @@ export default function MonthlyTrend() {
                         <BarChart3 className="h-5 w-5 text-violet-400" />
                         Monthly Trend
                     </CardTitle>
-                    <CardDescription>Income vs Expenses grouped by month</CardDescription>
+                    <CardDescription>Recorded credits vs spending, excluding transfers and pending transactions</CardDescription>
                 </div>
 
                 {/* Summary pills */}
                 <div className="flex items-center gap-3 text-xs">
                     <span className="flex items-center gap-1.5 text-muted-foreground">
                         <span className="h-2 w-2 rounded-sm bg-emerald-400 inline-block" />
-                        Income
+                        Credits
                     </span>
                     <span className="flex items-center gap-1.5 text-muted-foreground">
                         <span className="h-2 w-2 rounded-sm bg-rose-400 inline-block" />
@@ -154,7 +154,7 @@ export default function MonthlyTrend() {
                             <ReferenceLine y={0} stroke="rgba(24,24,27,0.12)" />
                             <Tooltip content={<CustomTooltip />} cursor={{ fill: "rgba(24,24,27,0.04)" }} />
 
-                            <Bar dataKey="income" name="Income" radius={[4, 4, 0, 0]} maxBarSize={32}>
+                            <Bar dataKey="income" name="Credits" radius={[4, 4, 0, 0]} maxBarSize={32}>
                                 {rawData.map((_, i) => (
                                     <Cell key={i} fill="#10b981" fillOpacity={0.85} />
                                 ))}

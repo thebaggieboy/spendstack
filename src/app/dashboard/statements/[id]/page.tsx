@@ -25,7 +25,7 @@ type StatementTransaction = {
     amount: number
     category: string
     category_color: string
-    running_balance: number
+    cumulative_flow: number
     is_transfer: boolean
 }
 
@@ -33,7 +33,7 @@ type StatementDetail = {
     filename: string
     upload_date: string
     stats: {
-        total_income: number
+        total_credits: number
         total_expenses: number
         net: number
         transaction_count: number
@@ -41,7 +41,7 @@ type StatementDetail = {
     }
     transactions: StatementTransaction[]
     category_breakdown: { name: string; value: number; color: string }[]
-    daily_data: { date: string; income: number; expenses: number }[]
+    daily_data: { date: string; credits: number; expenses: number }[]
 }
 
 type TooltipItem = { color?: string; stroke?: string; name?: string; value?: number }
@@ -106,13 +106,13 @@ export default function StatementDetailPage() {
         tx.category?.toLowerCase().includes(search.toLowerCase())
     ) ?? []
 
-    const balanceData = transactions?.map(tx => ({
+    const flowData = transactions?.map(tx => ({
         date: tx.date_display,
-        "Balance": tx.running_balance,
+        "Cumulative flow": tx.cumulative_flow,
     })) ?? []
 
     const statCards = [
-        { label: "Total Income", value: formatNaira(stats.total_income), icon: TrendingUp, color: "emerald", colorHex: "#22c55e" },
+        { label: "Total Credits", value: formatNaira(stats.total_credits), icon: TrendingUp, color: "emerald", colorHex: "#22c55e" },
         { label: "Total Expenses", value: formatNaira(stats.total_expenses), icon: TrendingDown, color: "rose", colorHex: "#f43f5e" },
         { label: "Net Cash Flow", value: formatNaira(Math.abs(stats.net)), sub: stats.net >= 0 ? "positive" : "negative", icon: Wallet, color: stats.net >= 0 ? "emerald" : "rose", colorHex: stats.net >= 0 ? "#22c55e" : "#f43f5e" },
         { label: "Unique Merchants", value: stats.merchant_count, icon: Store, color: "blue", colorHex: "#3b82f6" },
@@ -168,12 +168,12 @@ export default function StatementDetailPage() {
                 {/* Running Balance Chart */}
                 <Card className="lg:col-span-2">
                     <CardHeader className="pb-2">
-                        <CardTitle className="text-sm">Running Balance Over Time</CardTitle>
-                        <CardDescription>Cumulative balance from statement transactions</CardDescription>
+                        <CardTitle className="text-sm">Cumulative Posted Transaction Flow</CardTitle>
+                        <CardDescription>Posted transaction amounts added from zero; this is not your account balance because the opening balance is not included.</CardDescription>
                     </CardHeader>
                     <CardContent>
                         <ResponsiveContainer width="100%" height={220}>
-                            <AreaChart data={balanceData}>
+                            <AreaChart data={flowData}>
                                 <defs>
                                     <linearGradient id="balGrad" x1="0" y1="0" x2="0" y2="1">
                                         <stop offset="5%" stopColor="#6366f1" stopOpacity={0.3} />
@@ -184,7 +184,7 @@ export default function StatementDetailPage() {
                                 <XAxis dataKey="date" tick={{ fontSize: 10, fill: "#71717a" }} interval="preserveStartEnd" />
                                 <YAxis tickFormatter={v => formatNaira(v)} tick={{ fontSize: 10, fill: "#71717a" }} />
                                 <Tooltip content={<CustomTooltip />} />
-                                <Area type="monotone" dataKey="Balance" stroke="#6366f1" strokeWidth={2} fill="url(#balGrad)" dot={false} />
+                                <Area type="monotone" dataKey="Cumulative flow" stroke="#6366f1" strokeWidth={2} fill="url(#balGrad)" dot={false} />
                             </AreaChart>
                         </ResponsiveContainer>
                     </CardContent>
@@ -226,8 +226,8 @@ export default function StatementDetailPage() {
             {/* Charts Row 2 — Daily Activity */}
             <Card>
                 <CardHeader className="pb-2">
-                    <CardTitle className="text-sm">Daily Income vs Expenses</CardTitle>
-                    <CardDescription>Day-by-day cash flow from this statement</CardDescription>
+                    <CardTitle className="text-sm">Daily Credits vs Spending</CardTitle>
+                    <CardDescription>Posted credits and spending, excluding transfers and pending transactions</CardDescription>
                 </CardHeader>
                 <CardContent>
                     <ResponsiveContainer width="100%" height={200}>
@@ -237,7 +237,7 @@ export default function StatementDetailPage() {
                             <YAxis tickFormatter={v => formatNaira(v)} tick={{ fontSize: 10, fill: "#71717a" }} />
                             <Tooltip content={<CustomTooltip />} />
                             <Legend iconType="circle" iconSize={8} wrapperStyle={{ fontSize: "11px" }} />
-                            <Bar dataKey="income" name="Income" fill="#22c55e" radius={[3, 3, 0, 0]} />
+                            <Bar dataKey="credits" name="Credits" fill="#22c55e" radius={[3, 3, 0, 0]} />
                             <Bar dataKey="expenses" name="Expenses" fill="#f43f5e" radius={[3, 3, 0, 0]} />
                         </BarChart>
                     </ResponsiveContainer>
@@ -272,7 +272,7 @@ export default function StatementDetailPage() {
                                 <div className="col-span-2">Category</div>
                                 <div className="col-span-2 text-right">Date</div>
                                 <div className="col-span-2 text-right">Amount</div>
-                                <div className="col-span-1 text-right">Balance</div>
+                                <div className="col-span-1 text-right">Flow</div>
                             </div>
 
                             <div className="divide-y divide-border">
@@ -306,7 +306,7 @@ export default function StatementDetailPage() {
                                                 {tx.amount > 0 ? "+" : ""}{formatNaira(Math.abs(tx.amount))}
                                             </div>
                                             <div className="col-span-1 text-right text-xs text-muted-foreground font-mono">
-                                                {formatNaira(tx.running_balance)}
+                                                {formatNaira(tx.cumulative_flow)}
                                             </div>
                                         </div>
                                     ))

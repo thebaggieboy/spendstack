@@ -185,6 +185,21 @@
   font-size: 0.88rem;
 }
 
+button,
+[role="button"] {
+  border-radius: 0 !important;
+}
+
+.dashboard-layout a[class*="rounded-"][class*="px-"][class*="bg-"] {
+  border-radius: 0 !important;
+}
+
+.dashboard-layout [class*="rounded-"][class*="border"][class*="bg-white"],
+.dashboard-layout section[class*="rounded-"][class*="border"],
+.dashboard-layout aside[class*="rounded-"][class*="border"] {
+  border-radius: 0 !important;
+}
+
 @keyframes route-enter {
   from {
     opacity: 0;

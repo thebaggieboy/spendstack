@@ -14,7 +14,7 @@ export default function Home() {
     <div className="mx-auto flex-1 max-w-7xl space-y-8 py-6">
 
       {/* Page header */}
-      <div className="flex flex-col gap-5 rounded-3xl border border-border bg-gradient-to-br from-white via-white to-violet-50/70 p-6 shadow-sm sm:flex-row sm:items-center sm:justify-between sm:p-8">
+      <div className="flex flex-col gap-5 border border-border bg-gradient-to-br from-white via-white to-violet-50/70 p-6 shadow-sm sm:flex-row sm:items-center sm:justify-between sm:p-8">
         <div>
           <p className="mb-3 inline-flex items-center gap-2 rounded-full border border-primary/15 bg-primary/5 px-3 py-1 text-xs font-medium text-primary">
             <Sparkles className="h-3.5 w-3.5" />
@@ -27,7 +27,7 @@ export default function Home() {
         </div>
         <Link
           href="/upload"
-          className="inline-flex h-11 items-center justify-center gap-2 self-start rounded-xl bg-primary px-5 text-sm font-semibold text-primary-foreground shadow-sm transition hover:bg-primary/90 sm:self-center"
+          className="inline-flex h-11 items-center justify-center gap-2 self-start bg-primary px-5 text-sm font-semibold text-primary-foreground shadow-sm transition hover:bg-primary/90 sm:self-center"
         >
           Upload statement
           <ArrowUpRight className="h-4 w-4" />

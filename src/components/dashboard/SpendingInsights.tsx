@@ -100,21 +100,21 @@ export default function SpendingInsights() {
             icon: CalendarDays,
             label: "Avg Daily Spend",
             value: formatNaira(data.avg_daily_spend),
-            sub: "On days with spending activity",
+            sub: "Average posted outflow on spending days",
             accent: "text-rose-400",
         },
         {
             icon: Receipt,
             label: "Avg Transaction",
             value: formatNaira(data.avg_transaction_value),
-            sub: `Across ${data.expense_txn_count} expense transactions`,
+            sub: `Across ${data.expense_txn_count} posted debit transactions`,
             accent: "text-orange-400",
         },
         {
             icon: SunMedium,
             label: "Busiest Spend Day",
             value: data.busiest_spend_day ?? "—",
-            sub: "Day of week with highest cumulative outflow",
+            sub: "Weekday with highest posted outflow",
             accent: "text-amber-400",
         },
         {
@@ -130,7 +130,7 @@ export default function SpendingInsights() {
             icon: Activity,
             label: "Total Transactions",
             value: data.total_txn_count.toLocaleString(),
-            sub: `${data.income_txn_count} credits · ${data.expense_txn_count} debits`,
+            sub: `${data.income_txn_count} credits · ${data.expense_txn_count} debits; transfers and pending excluded`,
             accent: "text-blue-400",
         },
         {
@@ -142,7 +142,7 @@ export default function SpendingInsights() {
         },
         {
             icon: Banknote,
-            label: "Income Transactions",
+            label: "Credit Transactions",
             value: data.income_txn_count.toLocaleString(),
             sub: "Total credit entries recorded",
             accent: "text-emerald-400",

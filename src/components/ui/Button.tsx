@@ -13,7 +13,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         return (
             <button
                 className={cn(
-                    "inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-all duration-200 ease-out hover:-translate-y-px active:translate-y-0 active:scale-[0.99] focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:transform-none disabled:opacity-50",
+                    "inline-flex items-center justify-center whitespace-nowrap text-sm font-medium transition-all duration-200 ease-out hover:-translate-y-px active:translate-y-0 active:scale-[0.99] focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:transform-none disabled:opacity-50",
                     {
                         "bg-primary text-primary-foreground shadow hover:bg-primary/90": variant === "default",
                         "bg-destructive text-destructive-foreground shadow-sm hover:bg-destructive/90": variant === "destructive",
@@ -23,11 +23,12 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
                         "text-primary underline-offset-4 hover:underline": variant === "link",
                         "bg-gradient-to-r from-primary to-purple-500 text-white shadow-lg hover:shadow-primary/50 transition-all duration-300 hover:-translate-y-0.5": variant === "gradient",
                         "h-9 px-4 py-2": size === "default",
-                        "h-8 rounded-md px-3 text-xs": size === "sm",
-                        "h-10 rounded-md px-8": size === "lg",
+                        "h-8 px-3 text-xs": size === "sm",
+                        "h-10 px-8": size === "lg",
                         "h-9 w-9": size === "icon",
                     },
-                    className
+                    className,
+                    "rounded-none"
                 )}
                 ref={ref}
                 {...props}

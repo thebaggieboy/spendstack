@@ -2,12 +2,27 @@
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
+function resolveApiRequestUrl(value: string): string {
+    if (typeof window === "undefined") return value;
+
+    const requestUrl = new URL(value, window.location.origin);
+    const currentHost = window.location.hostname;
+    if (
+        (requestUrl.hostname === "localhost" || requestUrl.hostname === "127.0.0.1") &&
+        currentHost !== "localhost" &&
+        currentHost !== "127.0.0.1"
+    ) {
+        requestUrl.hostname = currentHost;
+    }
+    return requestUrl.toString();
+}
+
 async function attemptTokenRefresh(): Promise<string | null> {
     const refreshToken = localStorage.getItem("refreshToken");
     if (!refreshToken) return null;
 
     try {
-        const res = await fetch(`${API_URL}users/token/refresh/`, {
+        const res = await fetch(resolveApiRequestUrl(`${API_URL}users/token/refresh/`), {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ refresh: refreshToken }),
@@ -40,7 +55,7 @@ export const requestWithAuth = async <T = unknown>(
         if (tkn) {
             headers.set("Authorization", `Bearer ${tkn}`);
         }
-        return fetch(url, { ...init, headers });
+        return fetch(resolveApiRequestUrl(url), { ...init, headers });
     };
 
     let res = await makeRequest(token);

@@ -2,35 +2,35 @@ import StatementUploader from "@/components/upload/StatementUploader"
 
 export default function UploadPage() {
     return (
-        <div className="flex-1 space-y-6 pt-4 max-w-4xl mx-auto w-full">
-            <div>
+        <div className="mx-auto w-full max-w-4xl space-y-7 px-4 py-4 sm:px-0 sm:py-2">
+            <header className="space-y-2">
                 <h2 className="text-3xl font-bold tracking-tight text-foreground">Upload Statement</h2>
-                <p className="text-muted-foreground mt-2">
-                    Securely upload your bank statements. Our AI engine will automatically parse, categorize, and analyze your financial data to provide immediate insights.
+                <p className="max-w-2xl text-sm leading-relaxed text-muted-foreground sm:text-base">
+                    Securely upload a CSV, Excel, or searchable PDF statement. Transactions are read and categorized locally, then shown for your review before import.
                 </p>
-            </div>
+            </header>
 
-            <div className="mt-8">
+            <section aria-label="Statement upload" className="w-full">
                 <StatementUploader />
-            </div>
+            </section>
 
-            <div className="mt-12 grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div className="p-6 rounded-2xl bg-card border border-border">
-                    <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center mb-4 text-primary font-bold">1</div>
-                    <h4 className="font-semibold text-foreground mb-2">Upload</h4>
-                    <p className="text-sm text-muted-foreground">Drag and drop your PDF or CSV bank statement directly into the upload zone.</p>
-                </div>
-                <div className="p-6 rounded-2xl bg-card border border-border">
-                    <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center mb-4 text-primary font-bold">2</div>
-                    <h4 className="font-semibold text-foreground mb-2">AI Analysis</h4>
-                    <p className="text-sm text-muted-foreground">Our intelligent engine securely reads your transactions and categorizes them automatically.</p>
-                </div>
-                <div className="p-6 rounded-2xl bg-card border border-border">
-                    <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center mb-4 text-primary font-bold">3</div>
-                    <h4 className="font-semibold text-foreground mb-2">Insights</h4>
-                    <p className="text-sm text-muted-foreground">Instantly view visualizations, top merchants, and personalized advice on your dashboard.</p>
-                </div>
-            </div>
+            <section aria-label="How statement import works" className="grid grid-cols-1 gap-3 sm:grid-cols-3 sm:gap-4">
+                <article className="rounded-2xl border border-border bg-card p-4 sm:p-5">
+                    <div className="mb-3 flex h-9 w-9 items-center justify-center rounded-full bg-primary/10 font-semibold text-primary">1</div>
+                    <h3 className="mb-1 font-semibold text-foreground">Upload</h3>
+                    <p className="text-sm leading-relaxed text-muted-foreground">Choose a CSV, Excel, or searchable PDF bank statement.</p>
+                </article>
+                <article className="rounded-2xl border border-border bg-card p-4 sm:p-5">
+                    <div className="mb-3 flex h-9 w-9 items-center justify-center rounded-full bg-primary/10 font-semibold text-primary">2</div>
+                    <h3 className="mb-1 font-semibold text-foreground">Review</h3>
+                    <p className="text-sm leading-relaxed text-muted-foreground">Check the locally parsed transactions and resolve any rows that need attention.</p>
+                </article>
+                <article className="rounded-2xl border border-border bg-card p-4 sm:p-5">
+                    <div className="mb-3 flex h-9 w-9 items-center justify-center rounded-full bg-primary/10 font-semibold text-primary">3</div>
+                    <h3 className="mb-1 font-semibold text-foreground">Import</h3>
+                    <p className="text-sm leading-relaxed text-muted-foreground">Confirm the preview to add transactions to your dashboard.</p>
+                </article>
+            </section>
         </div>
     )
 }

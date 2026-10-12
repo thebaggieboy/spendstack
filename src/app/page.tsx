@@ -53,7 +53,7 @@ const useCases = [
     {
         icon: LockKeyhole,
         title: "Set money aside with intention",
-        description: "Fund your wallet, lock funds for a chosen period, and arrange a scheduled payout to a verified bank account.",
+        description: "Fund your wallet, lock funds for a chosen period, and schedule a payout to a verified bank account.",
         detail: "Locks & payouts",
     },
 ]
@@ -219,6 +219,78 @@ export default function LandingPage() {
                         <ArrowRightLeft className="mt-0.5 h-4 w-4 shrink-0 text-white" />
                         Transfers stay separate from spending totals. Wallet locks and scheduled payouts require Paystack setup and a verified bank recipient.
                     </p>
+                </div>
+            </section>
+
+            <section className="w-full border-b border-border bg-slate-50 px-4 py-14 sm:px-6 sm:py-16 lg:py-20">
+                <div className="mx-auto grid max-w-6xl items-center gap-8 lg:grid-cols-[1fr_0.9fr] lg:gap-16">
+                    <div>
+                        <p className="mb-3 inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-widest text-primary">
+                            <LockKeyhole className="h-4 w-4" />
+                            Lock money, on your terms
+                        </p>
+                        <h2 className="max-w-xl text-2xl font-semibold leading-tight tracking-tight text-foreground sm:text-3xl md:text-4xl">
+                            Put money aside now. Plan how it comes back to you.
+                        </h2>
+                        <p className="mt-4 max-w-xl text-sm leading-relaxed text-muted-foreground sm:text-base">
+                            Choose an amount, lock it for a set period, and send the payout to a verified bank account when it matures. We’re working toward flexible installments, so you can plan a series of smaller payouts instead of one lump sum.
+                        </p>
+                        <Link
+                            href="/signup"
+                            className="mt-6 inline-flex h-11 items-center justify-center gap-2 rounded-xl bg-primary px-5 text-sm font-medium text-primary-foreground transition hover:opacity-90"
+                        >
+                            Get started
+                            <ArrowRight className="h-4 w-4" />
+                        </Link>
+                    </div>
+
+                    <div className="rounded-2xl border border-border bg-white p-5 shadow-[0_20px_60px_-35px_rgba(35,25,70,0.3)] sm:p-7">
+                        <div className="flex items-start justify-between gap-4">
+                            <div>
+                                <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">Planned installment example</p>
+                                <p className="mt-2 text-2xl font-semibold tracking-tight text-foreground sm:text-3xl">₦100,000</p>
+                                <p className="mt-1 text-sm text-muted-foreground">locked from your available wallet balance</p>
+                            </div>
+                            <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-violet-50 text-violet-700">
+                                <LockKeyhole className="h-5 w-5" />
+                            </span>
+                        </div>
+
+                        <div className="my-5 flex items-center justify-between gap-3 rounded-xl bg-slate-50 p-4">
+                            <div>
+                                <p className="text-xs text-muted-foreground">Payout amount</p>
+                                <p className="mt-1 font-semibold text-foreground">₦10,000 <span className="text-xs font-normal text-muted-foreground">per week</span></p>
+                            </div>
+                            <div className="h-9 w-px bg-border" aria-hidden="true" />
+                            <div>
+                                <p className="text-xs text-muted-foreground">Payout period</p>
+                                <p className="mt-1 font-semibold text-foreground">10 weeks</p>
+                            </div>
+                        </div>
+
+                        <div className="space-y-2" aria-label="Example weekly payout schedule">
+                            {[1, 2, 3].map(week => (
+                                <div key={week} className="flex items-center justify-between rounded-lg border border-border px-3 py-2.5 text-sm">
+                                    <span className="flex items-center gap-2 text-muted-foreground">
+                                        <span className="flex h-6 w-6 items-center justify-center rounded-full bg-violet-50 text-[10px] font-semibold text-violet-700">{week}</span>
+                                        Week {week}
+                                    </span>
+                                    <span className="font-medium text-foreground">₦10,000</span>
+                                </div>
+                            ))}
+                            <p className="py-1 text-center text-xs tracking-widest text-muted-foreground" aria-hidden="true">···</p>
+                            <div className="flex items-center justify-between rounded-lg border border-border px-3 py-2.5 text-sm">
+                                <span className="flex items-center gap-2 text-muted-foreground">
+                                    <span className="flex h-6 w-6 items-center justify-center rounded-full bg-violet-50 text-[10px] font-semibold text-violet-700">10</span>
+                                    Week 10
+                                </span>
+                                <span className="font-medium text-foreground">₦10,000</span>
+                            </div>
+                        </div>
+                        <p className="mt-4 text-xs leading-relaxed text-muted-foreground">
+                            Installment payouts are a planned example, not available yet. Today, a money lock schedules the full locked amount as one payout at maturity. No interest or investment return is implied.
+                        </p>
+                    </div>
                 </div>
             </section>
 

@@ -71,6 +71,8 @@ export default function StatementUploader() {
         if (!file) return
         setIsProcessing(true)
         setError(null)
+        const controller = new AbortController()
+        const timeoutId = window.setTimeout(() => controller.abort(), 120_000)
         const formData = new FormData()
         formData.append("file", file)
 
@@ -78,11 +80,21 @@ export default function StatementUploader() {
             const result = await requestWithAuth<StatementPreview>(`${API_URL}analysis/preview/`, {
                 method: "POST",
                 body: formData,
+                signal: controller.signal,
             })
             setPreview(result)
         } catch (requestError) {
-            setError(requestError instanceof Error ? requestError.message : "Could not analyze the statement.")
+            setError(
+                requestError instanceof Error && requestError.name === "AbortError"
+                    ? "Statement processing took too long and was stopped. Check your connection and try again, or export the statement as CSV/Excel."
+                    : requestError instanceof TypeError
+                        ? "Could not connect to the statement service. Check your internet connection. For local mobile testing, make sure the backend is reachable from the same network."
+                    : requestError instanceof Error
+                        ? requestError.message
+                        : "Could not analyze the statement.",
+            )
         } finally {
+            window.clearTimeout(timeoutId)
             setIsProcessing(false)
         }
     }
@@ -156,7 +168,7 @@ export default function StatementUploader() {
 
                 {!preview && (
                     <div
-                        className={`flex min-h-64 flex-col items-center justify-center rounded-xl border-2 border-dashed p-8 transition ${isHovering ? "border-primary bg-primary/5" : "border-border hover:border-primary/40 hover:bg-muted/30"} ${!file && !isProcessing ? "cursor-pointer" : ""}`}
+                        className={`flex min-h-56 flex-col items-center justify-center rounded-xl border-2 border-dashed p-4 text-center transition sm:min-h-64 sm:p-8 ${isHovering ? "border-primary bg-primary/5" : "border-border hover:border-primary/40 hover:bg-muted/30"} ${!file && !isProcessing ? "cursor-pointer" : ""}`}
                         onDragOver={event => { event.preventDefault(); setIsHovering(true) }}
                         onDragLeave={() => setIsHovering(false)}
                         onDrop={handleDrop}
@@ -172,7 +184,10 @@ export default function StatementUploader() {
                         {isProcessing ? (
                             <div className="flex flex-col items-center gap-4">
                                 <Loader2 className="h-10 w-10 animate-spin text-primary" />
-                                <p className="text-sm font-medium text-foreground">Reading and categorizing transactions…</p>
+                                <div>
+                                    <p className="text-sm font-medium text-foreground">Reading and categorizing transactions…</p>
+                                    <p className="mt-1 max-w-xs text-xs leading-relaxed text-muted-foreground">PDFs and slower mobile connections can take a little longer. This request will stop after two minutes.</p>
+                                </div>
                             </div>
                         ) : file ? (
                             <div className="flex flex-col items-center gap-4 text-center">

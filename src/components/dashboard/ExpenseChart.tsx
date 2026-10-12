@@ -18,6 +18,16 @@ export default function ExpenseChart() {
     const formatNairaTooltip = (value: number) =>
         new Intl.NumberFormat('en-NG', { style: 'currency', currency: 'NGN' }).format(value)
 
+    const formatDateTick = (value: string) =>
+        new Date(`${value}T00:00:00`).toLocaleDateString("en-NG", { day: "numeric", month: "short" })
+
+    const formatDateTooltip = (value: string) =>
+        new Date(`${value}T00:00:00`).toLocaleDateString("en-NG", {
+            day: "numeric",
+            month: "short",
+            year: "numeric",
+        })
+
     const cardBase = "col-span-1 lg:col-span-4"
 
     if (isLoading) {
@@ -41,7 +51,7 @@ export default function ExpenseChart() {
                 </div>
                 <div className="text-center space-y-1">
                     <p className="font-medium text-foreground">No cash flow data yet</p>
-                    <p className="text-sm text-muted-foreground">Upload a bank statement to see your income vs expenses chart.</p>
+                    <p className="text-sm text-muted-foreground">Upload a bank statement to see your credits vs spending chart.</p>
                 </div>
             </Card>
         )
@@ -54,7 +64,7 @@ export default function ExpenseChart() {
                     <LineChartIcon className="h-5 w-5 text-emerald-400" />
                     Cash Flow Overview
                 </CardTitle>
-                <CardDescription>Income vs Expenses — your actual transaction history</CardDescription>
+                <CardDescription>Recorded credits vs spending, excluding transfers and pending transactions</CardDescription>
             </CardHeader>
             <CardContent className="pl-0">
                 <div className="h-[300px] w-full mt-4">
@@ -72,6 +82,7 @@ export default function ExpenseChart() {
                             </defs>
                             <XAxis
                                 dataKey="date"
+                                tickFormatter={formatDateTick}
                                 stroke="#888888"
                                 fontSize={12}
                                 tickLine={false}
@@ -88,6 +99,7 @@ export default function ExpenseChart() {
                                 width={60}
                             />
                             <Tooltip
+                                labelFormatter={(label) => formatDateTooltip(String(label))}
                                 formatter={(value: any) => [formatNairaTooltip(value as number), undefined]}
                                 contentStyle={{
                                     backgroundColor: '#ffffff',
@@ -106,7 +118,7 @@ export default function ExpenseChart() {
                                 fillOpacity={1}
                                 fill="url(#colorIncome)"
                                 activeDot={{ r: 5, fill: '#10b981', strokeWidth: 0 }}
-                                name="Income"
+                                name="Credits"
                             />
                             <Area
                                 type="monotone"
@@ -126,7 +138,7 @@ export default function ExpenseChart() {
                 <div className="flex items-center gap-6 px-6 mt-2 text-sm text-muted-foreground">
                     <span className="flex items-center gap-2">
                         <span className="inline-block h-2.5 w-2.5 rounded-full bg-emerald-400" />
-                        Income
+                        Credits
                     </span>
                     <span className="flex items-center gap-2">
                         <span className="inline-block h-2.5 w-2.5 rounded-full bg-rose-400" />

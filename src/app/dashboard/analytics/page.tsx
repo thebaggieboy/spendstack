@@ -3,7 +3,6 @@
 import useSWR from "swr"
 import { BarChart as BarChartIcon, Download, TrendingDown, TrendingUp, Minus } from "lucide-react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/Card"
-import ProFeatureGate from "@/components/billing/ProFeatureGate"
 import ExpenseChart from "@/components/dashboard/ExpenseChart"
 import CategoryBreakdown from "@/components/dashboard/CategoryBreakdown"
 import { fetchWithAuth } from "@/lib/fetcher"
@@ -28,7 +27,7 @@ function periodLabel(start: string, end: string) {
     return `${from} – ${to}`
 }
 
-function AnalyticsContent() {
+export default function AnalyticsPage() {
     const { data, error, isLoading } = useSWR<MonthlyComparison>(
         `${API_URL}dashboard/monthly-comparison/`,
         fetchWithAuth,
@@ -41,7 +40,7 @@ function AnalyticsContent() {
             ["Metric", "Current period", "Previous comparable period", "Change"],
             ["Period", periodLabel(data.current_period.start, data.current_period.end), periodLabel(data.previous_period.start, data.previous_period.end), ""],
             ["Spending (NGN)", data.expenses.current, data.expenses.previous, data.expenses.change.amount],
-            ["Income (NGN)", data.income.current, data.income.previous, data.income.change.amount],
+            ["Credits (NGN)", data.income.current, data.income.previous, data.income.change.amount],
             ...data.categories.map(category => [
                 `${category.category} spending (NGN)`,
                 category.current,
@@ -65,7 +64,7 @@ function AnalyticsContent() {
             <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
                 <div>
                     <h1 className="text-3xl font-bold tracking-tight text-foreground">Analytics</h1>
-                    <p className="mt-1 text-muted-foreground">Compare spending over equivalent periods, excluding transfers.</p>
+                    <p className="mt-1 text-muted-foreground">Compare credits and spending over equivalent periods, excluding transfers and pending transactions.</p>
                 </div>
                 <button
                     type="button"
@@ -107,9 +106,9 @@ function AnalyticsContent() {
                                 <div className="grid gap-3 sm:grid-cols-2">
                                     {[
                                         { label: "Spending", metric: data.expenses, icon: data.expenses.change.amount > 0 ? TrendingUp : data.expenses.change.amount < 0 ? TrendingDown : Minus, tone: data.expenses.change.amount > 0 ? "text-red-700" : "text-emerald-700" },
-                                        { label: "Income", metric: data.income, icon: data.income.change.amount > 0 ? TrendingUp : data.income.change.amount < 0 ? TrendingDown : Minus, tone: data.income.change.amount > 0 ? "text-emerald-700" : "text-muted-foreground" },
+                                        { label: "Credits", metric: data.income, icon: data.income.change.amount > 0 ? TrendingUp : data.income.change.amount < 0 ? TrendingDown : Minus, tone: data.income.change.amount > 0 ? "text-emerald-700" : "text-muted-foreground" },
                                     ].map(({ label, metric, icon: Icon, tone }) => (
-                                        <div key={label} className="rounded-xl border border-border bg-white p-4">
+                                        <div key={label} className="border border-border bg-white p-4">
                                             <p className="text-sm text-muted-foreground">{label} this period</p>
                                             <p className="mt-1 text-xl font-semibold text-foreground">{money(metric.current)}</p>
                                             <p className={`mt-2 flex items-center gap-1 text-xs ${tone}`}>
@@ -129,7 +128,7 @@ function AnalyticsContent() {
                                     ) : (
                                         <div className="space-y-2">
                                             {data.categories.map(category => (
-                                                <div key={category.category} className="flex items-center justify-between gap-3 rounded-lg bg-muted/50 px-3 py-2 text-sm">
+                                                <div key={category.category} className="flex items-center justify-between gap-3 bg-muted/50 px-3 py-2 text-sm">
                                                     <span className="truncate text-foreground">{category.category}</span>
                                                     <span className={`whitespace-nowrap font-medium ${category.change > 0 ? "text-red-700" : category.change < 0 ? "text-emerald-700" : "text-muted-foreground"}`}>
                                                         {category.change > 0 ? "+" : category.change < 0 ? "−" : ""}{money(Math.abs(category.change))}
@@ -148,13 +147,5 @@ function AnalyticsContent() {
                 </Card>
             </div>
         </div>
-    )
-}
-
-export default function AnalyticsPage() {
-    return (
-        <ProFeatureGate feature="Advanced analytics and report exports">
-            <AnalyticsContent />
-        </ProFeatureGate>
     )
 }

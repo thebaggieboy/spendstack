@@ -1,6 +1,6 @@
 "use client"
 
-import { FormEvent, useEffect, useState } from "react"
+import { FormEvent, useCallback, useEffect, useState } from "react"
 import useSWR from "swr"
 import { AlertCircle, ArrowDownToLine, ArrowUpRight, CalendarClock, CheckCircle2, Loader2, LockKeyhole, Plus, Wallet } from "lucide-react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/Card"
@@ -57,42 +57,137 @@ export default function LockMoneyPage() {
     const [notice, setNotice] = useState("")
     const [error, setError] = useState("")
     const [working, setWorking] = useState("")
+    const [pendingFundingReference, setPendingFundingReference] = useState("")
+    const [pendingFundingGateway, setPendingFundingGateway] = useState<"paystack" | "bachs">("paystack")
+    const [fundingGateway, setFundingGateway] = useState<"paystack" | "bachs">("paystack")
+
+    const verifyFunding = useCallback(async (reference: string) => {
+        setWorking("verify")
+        setError("")
+        setNotice("")
+        try {
+            const result = await requestWithAuth<{ message: string }>(
+                `${savingsUrl}fund/verify/?reference=${encodeURIComponent(reference)}`,
+            )
+            setNotice(result.message)
+            setPendingFundingReference("")
+            window.history.replaceState({}, "", "/dashboard/lock-money")
+            await refreshWallet()
+        } catch (err) {
+            setError(err instanceof Error ? err.message : "Could not verify your payment.")
+        } finally {
+            setWorking("")
+        }
+    }, [refreshWallet])
 
     useEffect(() => {
         const params = new URLSearchParams(window.location.search)
-        if (params.get("funding") !== "return") return
-        const reference = params.get("reference")
+        const funding = params.get("funding")
+        if (funding === "bachs-cancel") {
+            setNotice("Bachs checkout was cancelled. Your wallet was not funded.")
+            window.history.replaceState({}, "", "/dashboard/lock-money")
+            return
+        }
+        if (funding === "bachs-return") {
+            const reference = params.get("reference")
+            if (!reference) {
+                setError("The Bachs return did not include a payment reference. Check your wallet before trying again.")
+                return
+            }
+            setPendingFundingReference(reference)
+            setPendingFundingGateway("bachs")
+            setNotice("Payment submitted. Waiting for Bachs to confirm it securely…")
+            return
+        }
+        if (funding !== "return") return
+        const reference = params.get("reference") || params.get("trxref")
         if (!reference) {
             setError("The payment return did not include a reference. Contact support before trying to pay again.")
             return
         }
-        setWorking("verify")
-        void requestWithAuth<{ message: string }>(`${savingsUrl}fund/verify/?reference=${encodeURIComponent(reference)}`)
-            .then(result => {
-                setNotice(result.message)
-                return refreshWallet()
-            })
-            .catch(err => setError(err instanceof Error ? err.message : "Could not verify your payment."))
-            .finally(() => {
-                setWorking("")
+        setPendingFundingReference(reference)
+        void verifyFunding(reference)
+    }, [refreshWallet, verifyFunding])
+
+    useEffect(() => {
+        if (!pendingFundingReference || pendingFundingGateway !== "bachs") return
+        let active = true
+        let attempts = 0
+        let lastStatusError = ""
+        let timeout: ReturnType<typeof setTimeout>
+
+        const checkStatus = async () => {
+            if (!active) return
+            attempts += 1
+            try {
+                const result = await requestWithAuth<{ status: string; amount: string }>(
+                    `${savingsUrl}fund/bachs/status/?reference=${encodeURIComponent(pendingFundingReference)}`,
+                )
+                if (!active) return
+                lastStatusError = ""
+                if (result.status === "completed") {
+                    setNotice(`Your ${formatNaira(Number(result.amount))} wallet funding was confirmed by Bachs.`)
+                    setPendingFundingReference("")
+                    window.history.replaceState({}, "", "/dashboard/lock-money")
+                    try {
+                        await refreshWallet()
+                    } catch {
+                        setError("Bachs confirmed the payment, but your wallet balance could not be refreshed. Reload the page to see the updated balance.")
+                    }
+                    return
+                }
+                if (result.status === "failed") {
+                    setError("Bachs could not verify this payment. Your wallet was not credited; contact support before retrying if you were charged.")
+                    setPendingFundingReference("")
+                    window.history.replaceState({}, "", "/dashboard/lock-money")
+                    return
+                }
+            } catch (err) {
+                lastStatusError = err instanceof Error ? err.message : "Unable to reach the payment status service."
+            }
+
+            if (attempts >= 24) {
+                if (lastStatusError) {
+                    setError(`Could not check the Bachs payment status: ${lastStatusError} Your wallet is only credited after server confirmation; contact support if you were charged.`)
+                } else {
+                    setNotice("Your payment is still awaiting Bachs confirmation. Your wallet will update automatically once the signed payment notice arrives.")
+                }
+                setPendingFundingReference("")
                 window.history.replaceState({}, "", "/dashboard/lock-money")
-            })
-    }, [refreshWallet])
+                return
+            }
+            timeout = setTimeout(() => void checkStatus(), 5000)
+        }
+
+        void checkStatus()
+        return () => {
+            active = false
+            clearTimeout(timeout)
+        }
+    }, [pendingFundingGateway, pendingFundingReference, refreshWallet])
 
     async function startFunding(event: FormEvent<HTMLFormElement>) {
         event.preventDefault()
         setError("")
         setNotice("")
+        setPendingFundingReference("")
         setWorking("fund")
         try {
-            const result = await requestWithAuth<{ authorization_url: string }>(`${savingsUrl}fund/initialize/`, {
+            const result = await requestWithAuth<{ authorization_url: string; gateway: "paystack" | "bachs" }>(`${savingsUrl}fund/initialize/`, {
                 method: "POST",
-                body: JSON.stringify({ amount: fundAmount }),
+                body: JSON.stringify({ amount: fundAmount, gateway: fundingGateway }),
             })
-            if (!result.authorization_url) throw new Error("Paystack did not return a checkout link.")
+            const expectedHost = result.gateway === "bachs" ? "checkout.bachs.io" : "checkout.paystack.com"
+            if (
+                !result.authorization_url ||
+                new URL(result.authorization_url).hostname !== expectedHost ||
+                !result.authorization_url.startsWith("https://")
+            ) {
+                throw new Error(`${result.gateway === "bachs" ? "Bachs" : "Paystack"} did not return a valid secure checkout link.`)
+            }
             window.location.assign(result.authorization_url)
         } catch (err) {
-            setError(err instanceof Error ? err.message : "Could not start Paystack checkout.")
+            setError(err instanceof Error ? err.message : `Could not start ${fundingGateway} checkout.`)
             setWorking("")
         }
     }
@@ -170,7 +265,7 @@ export default function LockMoneyPage() {
             </header>
 
             {notice && <div role="status" className="flex items-center gap-2 rounded-xl border border-emerald-200 bg-emerald-50 p-4 text-sm text-emerald-800"><CheckCircle2 className="h-4 w-4 shrink-0" />{notice}</div>}
-            {error && <div role="alert" className="flex items-center gap-2 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-800"><AlertCircle className="h-4 w-4 shrink-0" />{error}</div>}
+            {error && <div role="alert" className="flex flex-wrap items-center gap-2 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-800"><AlertCircle className="h-4 w-4 shrink-0" /><span className="min-w-0 flex-1">{error}</span>{pendingFundingReference && working !== "verify" && <button type="button" onClick={() => void verifyFunding(pendingFundingReference)} className="rounded-lg border border-red-300 bg-white px-3 py-2 text-xs font-medium text-red-800 hover:bg-red-100">Retry verification</button>}</div>}
 
             <section className="grid gap-4 sm:grid-cols-3" aria-label="Wallet balances">
                 {[
@@ -189,17 +284,28 @@ export default function LockMoneyPage() {
                 <Card>
                     <CardHeader>
                         <CardTitle className="flex items-center gap-2"><ArrowDownToLine className="h-5 w-5 text-primary" />Add funds</CardTitle>
-                        <CardDescription>Pay through Paystack checkout. Funds appear only after the payment is verified.</CardDescription>
+                        <CardDescription>Choose a payment gateway. Funds appear in your wallet only after the gateway confirms payment.</CardDescription>
                     </CardHeader>
                     <CardContent>
-                        <form onSubmit={startFunding} className="flex flex-col gap-3 sm:flex-row">
-                            <label className="sr-only" htmlFor="fund-amount">Funding amount</label>
-                            <input id="fund-amount" type="number" min="100" max="10000000" step="0.01" required value={fundAmount} onChange={event => setFundAmount(event.target.value)} placeholder="Amount in NGN (min ₦100)" className="h-11 flex-1 rounded-lg border border-input bg-white px-3 text-sm" />
-                            <button type="submit" disabled={working !== ""} className="inline-flex h-11 items-center justify-center gap-2 rounded-lg bg-primary px-4 text-sm font-medium text-primary-foreground disabled:opacity-60">
-                                {working === "fund" ? <Loader2 className="h-4 w-4 animate-spin" /> : <ArrowUpRight className="h-4 w-4" />} Continue to Paystack
+                        <form onSubmit={startFunding} className="grid gap-3 sm:grid-cols-[1fr_1fr_auto]">
+                            <label className="space-y-1 text-xs font-medium text-foreground">
+                                Funding amount
+                                <input id="fund-amount" type="number" min="100" max="10000000" step="0.01" required value={fundAmount} onChange={event => setFundAmount(event.target.value)} placeholder="Amount in NGN (min ₦100)" className="h-11 w-full rounded-lg border border-input bg-white px-3 text-sm" />
+                            </label>
+                            <label className="space-y-1 text-xs font-medium text-foreground">
+                                Payment gateway
+                                <select value={fundingGateway} onChange={event => setFundingGateway(event.target.value as "paystack" | "bachs")} className="h-11 w-full rounded-lg border border-input bg-white px-3 text-sm">
+                                    <option value="paystack">Paystack</option>
+                                    <option value="bachs">Bachs</option>
+                                </select>
+                            </label>
+                            <button type="submit" disabled={working !== ""} className="inline-flex h-11 items-center justify-center gap-2 self-end rounded-lg bg-primary px-4 text-sm font-medium text-primary-foreground disabled:opacity-60">
+                                {working === "fund" ? <Loader2 className="h-4 w-4 animate-spin" /> : <ArrowUpRight className="h-4 w-4" />} Continue to {fundingGateway === "bachs" ? "Bachs" : "Paystack"}
                             </button>
                         </form>
-                        <p className="mt-3 text-xs text-muted-foreground">Payments are confirmed server-side using Paystack verification and signed webhooks.</p>
+                        <p className="mt-3 text-xs leading-relaxed text-muted-foreground">
+                            Paystack and Bachs use hosted secure checkout. Your balance is updated only after server-side payment confirmation.
+                        </p>
                     </CardContent>
                 </Card>
 
