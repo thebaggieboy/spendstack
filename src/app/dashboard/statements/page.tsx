@@ -11,6 +11,38 @@ type StatementSummary = {
     filename: string
     upload_date: string
     transaction_count: number
+    period_start: string | null
+    period_end: string | null
+}
+
+function formatStatementPeriod(start: string | null, end: string | null) {
+    if (!start || !end) return "No transaction dates found"
+
+    const parseDate = (value: string) => {
+        const [year, month, day] = value.split("-").map(Number)
+        return new Date(year, month - 1, day)
+    }
+    const startDate = parseDate(start)
+    const endDate = parseDate(end)
+    const dateFormatter = new Intl.DateTimeFormat("en", { month: "short", day: "numeric" })
+    const fullDateFormatter = new Intl.DateTimeFormat("en", { month: "short", day: "numeric", year: "numeric" })
+    const startLabel = startDate.getFullYear() === endDate.getFullYear()
+        ? dateFormatter.format(startDate)
+        : fullDateFormatter.format(startDate)
+    const endLabel = fullDateFormatter.format(endDate)
+    const monthCount = (endDate.getFullYear() - startDate.getFullYear()) * 12
+        + endDate.getMonth() - startDate.getMonth() + 1
+    const monthFormatter = new Intl.DateTimeFormat("en", { month: "short", year: "numeric" })
+    const monthsSummary = monthCount === 1
+        ? new Intl.DateTimeFormat("en", { month: "long", year: "numeric" }).format(startDate)
+        : monthCount <= 4
+            ? `${Array.from({ length: monthCount }, (_, index) => {
+                const monthDate = new Date(startDate.getFullYear(), startDate.getMonth() + index, 1)
+                return monthFormatter.format(monthDate)
+            }).join(", ")} · ${monthCount} months`
+            : `${monthFormatter.format(startDate)} – ${monthFormatter.format(endDate)} · ${monthCount} months`
+
+    return `${startLabel} – ${endLabel} · ${monthsSummary}`
 }
 
 export default function StatementsPage() {
@@ -82,6 +114,10 @@ export default function StatementsPage() {
                                             <Calendar className="h-3.5 w-3.5 mr-1.5 opacity-70" />
                                             {stmt.upload_date}
                                         </div>
+
+                                        <p className="mb-4 text-xs text-muted-foreground" title="Date range of transactions in this statement">
+                                            Statement period: {formatStatementPeriod(stmt.period_start, stmt.period_end)}
+                                        </p>
 
                                         <div className="pt-4 border-t border-border flex justify-between items-center">
                                             <span className="text-xs text-muted-foreground">Extracted Data</span>

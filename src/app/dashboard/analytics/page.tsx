@@ -5,6 +5,8 @@ import { BarChart as BarChartIcon, Download, TrendingDown, TrendingUp, Minus } f
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/Card"
 import ExpenseChart from "@/components/dashboard/ExpenseChart"
 import CategoryBreakdown from "@/components/dashboard/CategoryBreakdown"
+import MonthlyTrend from "@/components/dashboard/MonthlyTrend"
+import SpendingInsights from "@/components/dashboard/SpendingInsights"
 import { fetchWithAuth } from "@/lib/fetcher"
 
 type MonthlyComparison = {
@@ -18,7 +20,10 @@ type MonthlyComparison = {
 const API_URL = process.env.NEXT_PUBLIC_API_URL
 
 function money(amount: number) {
-    return `₦${amount.toLocaleString("en-NG", { maximumFractionDigits: 0 })}`
+    return new Intl.NumberFormat("en-NG", {
+        style: "currency",
+        currency: "NGN",
+    }).format(amount)
 }
 
 function periodLabel(start: string, end: string) {
@@ -64,7 +69,7 @@ export default function AnalyticsPage() {
             <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
                 <div>
                     <h1 className="text-3xl font-bold tracking-tight text-foreground">Analytics</h1>
-                    <p className="mt-1 text-muted-foreground">Compare credits and spending over equivalent periods, excluding transfers and pending transactions.</p>
+                    <p className="mt-1 text-muted-foreground">Explore your spending insights, cash flow, categories, monthly trends, and period comparisons.</p>
                 </div>
                 <button
                     type="button"
@@ -77,15 +82,17 @@ export default function AnalyticsPage() {
                 </button>
             </div>
 
-            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+            <SpendingInsights />
+
+            <div className="grid grid-cols-1 gap-6 lg:grid-cols-7">
                 <ExpenseChart />
+                <CategoryBreakdown />
             </div>
 
-            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                <CategoryBreakdown />
+            <MonthlyTrend />
 
-                <Card className="col-span-1 lg:col-span-2">
-                    <CardHeader>
+            <Card>
+                <CardHeader>
                         <CardTitle className="flex items-center gap-2 text-base font-medium">
                             <BarChartIcon className="h-4 w-4 text-primary" />
                             Month-to-date comparison
@@ -144,8 +151,7 @@ export default function AnalyticsPage() {
                             </>
                         )}
                     </CardContent>
-                </Card>
-            </div>
+            </Card>
         </div>
     )
 }

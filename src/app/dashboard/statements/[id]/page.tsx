@@ -7,7 +7,7 @@ import { formatNaira } from "@/lib/utils"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/Card"
 import {
     FileText, Calendar, ArrowUpRight, ArrowDownRight, TrendingUp, TrendingDown,
-    Wallet, Store, Search, ArrowLeft, Loader2
+    Wallet, Store, Search, ArrowLeft, Loader2, AlertTriangle, CheckCircle2, Info
 } from "lucide-react"
 import {
     AreaChart, Area, BarChart, Bar, PieChart, Pie, Cell,
@@ -38,6 +38,32 @@ type StatementDetail = {
         net: number
         transaction_count: number
         merchant_count: number
+        highest_daily_spend: number
+        highest_daily_spend_date: string | null
+    }
+    statement_reconciliation: {
+        status: "matched" | "mismatch" | "review" | "unavailable"
+        statement_summary: {
+            opening_balance: string | null
+            closing_balance: string | null
+            total_credits: string | null
+            total_debits: string | null
+        }
+        ambiguous_fields: string[]
+        checks: Record<string, {
+            status: "match" | "mismatch" | "review" | "unavailable"
+            reported: number | null
+            from_transactions: number
+            difference?: number
+        }>
+        balance_movement: {
+            status: "match" | "mismatch" | "review" | "unavailable"
+            opening_balance: number | null
+            closing_balance: number | null
+            reported_movement?: number
+            transaction_net?: number
+            difference?: number
+        }
     }
     transactions: StatementTransaction[]
     category_breakdown: { name: string; value: number; color: string }[]
@@ -98,7 +124,7 @@ export default function StatementDetailPage() {
         )
     }
 
-    const { filename, upload_date, stats, transactions, category_breakdown, daily_data } = data
+    const { filename, upload_date, stats, transactions, category_breakdown, daily_data, statement_reconciliation } = data
 
     const filteredTx = transactions?.filter(tx =>
         tx.merchant_name?.toLowerCase().includes(search.toLowerCase()) ||
@@ -116,7 +142,20 @@ export default function StatementDetailPage() {
         { label: "Total Expenses", value: formatNaira(stats.total_expenses), icon: TrendingDown, color: "rose", colorHex: "#f43f5e" },
         { label: "Net Cash Flow", value: formatNaira(Math.abs(stats.net)), sub: stats.net >= 0 ? "positive" : "negative", icon: Wallet, color: stats.net >= 0 ? "emerald" : "rose", colorHex: stats.net >= 0 ? "#22c55e" : "#f43f5e" },
         { label: "Unique Merchants", value: stats.merchant_count, icon: Store, color: "blue", colorHex: "#3b82f6" },
+        { label: "Highest Daily Spend", value: formatNaira(stats.highest_daily_spend), sub: stats.highest_daily_spend_date ? `On ${stats.highest_daily_spend_date}` : "No spending", icon: TrendingDown, color: "rose", colorHex: "#f43f5e" },
     ]
+
+    const reconciliationTone = {
+        matched: "border-emerald-200 bg-emerald-50 text-emerald-800",
+        mismatch: "border-rose-200 bg-rose-50 text-rose-800",
+        review: "border-amber-200 bg-amber-50 text-amber-800",
+        unavailable: "border-slate-200 bg-slate-50 text-slate-700",
+    }[statement_reconciliation.status]
+    const reconciliationIcon = statement_reconciliation.status === "matched"
+        ? CheckCircle2
+        : statement_reconciliation.status === "mismatch"
+            ? AlertTriangle
+            : Info
 
     return (
         <div className="flex-1 space-y-6 p-4 sm:p-6 overflow-auto">
@@ -148,7 +187,7 @@ export default function StatementDetailPage() {
             </div>
 
             {/* Summary Cards */}
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
                 {statCards.map((c) => (
                     <Card key={c.label}>
                         <CardContent className="p-4 pl-5">
@@ -162,14 +201,70 @@ export default function StatementDetailPage() {
                     </Card>
                 ))}
             </div>
+            <p className="text-xs text-muted-foreground">
+                Statement totals include all posted debits and credits, including transfers. Category spending and highest daily spend exclude transfers.
+            </p>
+
+            <Card>
+                <CardHeader>
+                    <div className="flex flex-wrap items-center justify-between gap-3">
+                        <div>
+                            <CardTitle>Statement reconciliation</CardTitle>
+                            <CardDescription>Transaction rows are compared with explicitly printed statement totals; printed values never replace the row calculations.</CardDescription>
+                        </div>
+                        <span className={`inline-flex items-center gap-2 border px-3 py-1.5 text-xs font-medium uppercase ${reconciliationTone}`}>
+                            {(() => {
+                                const StatusIcon = reconciliationIcon
+                                return <StatusIcon className="h-4 w-4" />
+                            })()}
+                            {statement_reconciliation.status === "matched" ? "Available figures match" : statement_reconciliation.status === "mismatch" ? "Mismatch found" : statement_reconciliation.status === "review" ? "Review needed" : "Summary unavailable"}
+                        </span>
+                    </div>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                    <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+                        {([
+                            ["Total credits", "total_credits"],
+                            ["Total debits", "total_debits"],
+                        ] as const).map(([label, key]) => {
+                            const check = statement_reconciliation.checks[key]
+                            return (
+                                <div key={key} className="border border-border p-3">
+                                    <p className="text-xs text-muted-foreground">{label}</p>
+                                    <p className="mt-1 font-semibold">{formatNaira(check.from_transactions)}</p>
+                                    <p className="mt-1 text-xs text-muted-foreground">
+                                        Printed: {check.reported === null ? (check.status === "review" ? "conflicting values" : "not found") : formatNaira(check.reported)}
+                                    </p>
+                                    {check.status === "mismatch" && <p className="mt-1 text-xs text-rose-700">Difference: {formatNaira(Math.abs(check.difference ?? 0))}</p>}
+                                </div>
+                            )
+                        })}
+                        <div className="border border-border p-3">
+                            <p className="text-xs text-muted-foreground">Opening balance</p>
+                            <p className="mt-1 font-semibold">{statement_reconciliation.ambiguous_fields.includes("opening_balance") ? "Conflicting values" : statement_reconciliation.statement_summary.opening_balance === null ? "Not found" : formatNaira(Number(statement_reconciliation.statement_summary.opening_balance))}</p>
+                        </div>
+                        <div className="border border-border p-3">
+                            <p className="text-xs text-muted-foreground">Closing balance</p>
+                            <p className="mt-1 font-semibold">{statement_reconciliation.ambiguous_fields.includes("closing_balance") ? "Conflicting values" : statement_reconciliation.statement_summary.closing_balance === null ? "Not found" : formatNaira(Number(statement_reconciliation.statement_summary.closing_balance))}</p>
+                        </div>
+                    </div>
+                    <div className={`border p-3 text-sm ${reconciliationTone}`}>
+                        {statement_reconciliation.balance_movement.status === "match" || statement_reconciliation.balance_movement.status === "mismatch"
+                            ? <>Balance movement: {formatNaira(statement_reconciliation.balance_movement.reported_movement ?? 0)}; posted transaction net: {formatNaira(statement_reconciliation.balance_movement.transaction_net ?? 0)}.{statement_reconciliation.balance_movement.status === "mismatch" ? ` Difference: ${formatNaira(Math.abs(statement_reconciliation.balance_movement.difference ?? 0))}.` : " These amounts match."}</>
+                            : statement_reconciliation.balance_movement.status === "review"
+                                ? "Opening or closing balance appears more than once with conflicting values; balance movement could not be verified."
+                                : "Balance movement could not be verified because the statement did not provide both opening and closing balances."}
+                    </div>
+                </CardContent>
+            </Card>
 
             {/* Charts Row 1 */}
             <div className="grid gap-6 lg:grid-cols-3">
-                {/* Running Balance Chart */}
+                {/* Cumulative transaction flow chart */}
                 <Card className="lg:col-span-2">
                     <CardHeader className="pb-2">
                         <CardTitle className="text-sm">Cumulative Posted Transaction Flow</CardTitle>
-                        <CardDescription>Posted transaction amounts added from zero; this is not your account balance because the opening balance is not included.</CardDescription>
+                        <CardDescription>All posted transaction amounts, including transfers, added from zero; this is not your account balance because the opening balance is not included.</CardDescription>
                     </CardHeader>
                     <CardContent>
                         <ResponsiveContainer width="100%" height={220}>
@@ -226,8 +321,8 @@ export default function StatementDetailPage() {
             {/* Charts Row 2 — Daily Activity */}
             <Card>
                 <CardHeader className="pb-2">
-                    <CardTitle className="text-sm">Daily Credits vs Spending</CardTitle>
-                    <CardDescription>Posted credits and spending, excluding transfers and pending transactions</CardDescription>
+                    <CardTitle className="text-sm">Daily Credits vs Debits</CardTitle>
+                    <CardDescription>Daily posted credits and debits, including transfers and excluding pending transactions</CardDescription>
                 </CardHeader>
                 <CardContent>
                     <ResponsiveContainer width="100%" height={200}>

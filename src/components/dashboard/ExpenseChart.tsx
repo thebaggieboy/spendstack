@@ -100,7 +100,7 @@ export default function ExpenseChart() {
                             />
                             <Tooltip
                                 labelFormatter={(label) => formatDateTooltip(String(label))}
-                                formatter={(value: any) => [formatNairaTooltip(value as number), undefined]}
+                                formatter={(value) => [formatNairaTooltip(Number(value)), undefined]}
                                 contentStyle={{
                                     backgroundColor: '#ffffff',
                                     border: '1px solid hsl(240 6% 90%)',

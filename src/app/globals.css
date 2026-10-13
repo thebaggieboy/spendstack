@@ -190,11 +190,13 @@ button,
   border-radius: 0 !important;
 }
 
-.dashboard-layout a[class*="rounded-"][class*="px-"][class*="bg-"] {
+.dashboard-layout a[class*="rounded-"][class*="px-"][class*="bg-"],
+div[class*="rounded-"][class*="border"][class*="bg-white"],
+section[class*="rounded-"][class*="border"][class*="bg-white"],
+article[class*="rounded-"][class*="border"][class*="bg-white"] {
   border-radius: 0 !important;
 }
 
-.dashboard-layout [class*="rounded-"][class*="border"][class*="bg-white"],
 .dashboard-layout section[class*="rounded-"][class*="border"],
 .dashboard-layout aside[class*="rounded-"][class*="border"] {
   border-radius: 0 !important;

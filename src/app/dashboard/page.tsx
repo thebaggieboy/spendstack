@@ -1,13 +1,8 @@
 import OverviewCards from "@/components/dashboard/OverviewCards"
-import ExpenseChart from "@/components/dashboard/ExpenseChart"
-import CategoryBreakdown from "@/components/dashboard/CategoryBreakdown"
 import TransactionsList from "@/components/dashboard/TransactionsList"
 import TopMerchants from "@/components/dashboard/TopMerchants"
-import SpendingInsights from "@/components/dashboard/SpendingInsights"
-import MonthlyTrend from "@/components/dashboard/MonthlyTrend"
-import AIAdvisor from "@/components/ai/AIAdvisor"
 import Link from "next/link"
-import { ArrowUpRight, Sparkles } from "lucide-react"
+import { ArrowUpRight, BarChart3, Sparkles } from "lucide-react"
 
 export default function Home() {
   return (
@@ -22,37 +17,29 @@ export default function Home() {
           </p>
           <h1 className="text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">Dashboard</h1>
           <p className="mt-3 max-w-xl text-sm text-muted-foreground">
-            A clear view of your cash flow, spending patterns, and recent activity.
+            Your money at a glance, with recent transactions and your top merchants. Explore Analytics for detailed trends and insights.
           </p>
         </div>
-        <Link
-          href="/upload"
-          className="inline-flex h-11 items-center justify-center gap-2 self-start bg-primary px-5 text-sm font-semibold text-primary-foreground shadow-sm transition hover:bg-primary/90 sm:self-center"
-        >
-          Upload statement
-          <ArrowUpRight className="h-4 w-4" />
-        </Link>
+        <div className="flex flex-wrap items-center gap-3 self-start sm:self-center">
+          <Link
+            href="/dashboard/analytics"
+            className="inline-flex h-11 items-center justify-center gap-2 border border-border bg-white px-5 text-sm font-semibold text-foreground transition hover:bg-muted"
+          >
+            <BarChart3 className="h-4 w-4" />
+            View analytics
+          </Link>
+          <Link
+            href="/upload"
+            className="inline-flex h-11 items-center justify-center gap-2 bg-primary px-5 text-sm font-semibold text-primary-foreground shadow-sm transition hover:bg-primary/90"
+          >
+            Upload statement
+            <ArrowUpRight className="h-4 w-4" />
+          </Link>
+        </div>
       </div>
 
-      {/* Row 1: Key metric cards */}
       <OverviewCards />
 
-      {/* Row 2: Cash flow (daily area) + Category donut */}
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-7">
-        <ExpenseChart />
-        <CategoryBreakdown />
-      </div>
-
-      {/* Row 3: Monthly bar chart + AI Advisor */}
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-7">
-        <MonthlyTrend />
-        <AIAdvisor />
-      </div>
-
-      {/* Row 4: Smart spending stats */}
-      <SpendingInsights />
-
-      {/* Row 5: Recent transactions + Top merchants */}
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-5">
         <TransactionsList />
         <TopMerchants />

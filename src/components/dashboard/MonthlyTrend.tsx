@@ -29,10 +29,18 @@ const formatAxis = (value: number) => {
     return `₦${value}`
 }
 
-const CustomTooltip = ({ active, payload, label }: any) => {
+const CustomTooltip = ({
+    active,
+    payload,
+    label,
+}: {
+    active?: boolean
+    payload?: { dataKey?: string; value?: number | string }[]
+    label?: string
+}) => {
     if (!active || !payload?.length) return null
-    const income = payload.find((p: any) => p.dataKey === "income")?.value ?? 0
-    const expenses = payload.find((p: any) => p.dataKey === "expenses")?.value ?? 0
+    const income = Number(payload.find((p) => p.dataKey === "income")?.value ?? 0)
+    const expenses = Number(payload.find((p) => p.dataKey === "expenses")?.value ?? 0)
     const net = income - expenses
 
     return (
@@ -73,7 +81,7 @@ export default function MonthlyTrend() {
         fetcher
     )
 
-    const cardBase = "col-span-1 lg:col-span-4"
+    const cardBase = "w-full"
 
     if (isLoading) {
         return <Card className={`${cardBase} h-[380px] animate-pulse bg-muted`} />
@@ -181,7 +189,7 @@ export default function MonthlyTrend() {
                                     }`}
                                 >
                                     {row.net >= 0 ? "+" : ""}
-                                    {formatAxis(row.net)}
+                                    {formatNaira(row.net)}
                                 </span>
                             </div>
                         ))}
