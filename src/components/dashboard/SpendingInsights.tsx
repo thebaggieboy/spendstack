@@ -29,6 +29,7 @@ interface InsightData {
     total_txn_count: number
     income_txn_count: number
     expense_txn_count: number
+    spending_expense_txn_count: number
     unique_merchants: number
     no_spend_days: number
     top_category: string | null
@@ -144,7 +145,7 @@ export default function SpendingInsights() {
             icon: Receipt,
             label: "Avg Transaction",
             value: formatNaira(data.avg_transaction_value),
-            sub: `Across ${data.expense_txn_count} posted debit transactions`,
+            sub: `Across ${data.spending_expense_txn_count} non-transfer debit transactions`,
             accent: "text-orange-400",
         },
         {
@@ -152,7 +153,7 @@ export default function SpendingInsights() {
             label: "Busiest Spend Day",
             value: data.busiest_spend_day ?? "—",
             sub: "Weekday with highest posted outflow",
-            accent: "text-amber-400",
+            accent: "text-black",
         },
         {
             icon: ArrowDownCircle,
@@ -167,29 +168,29 @@ export default function SpendingInsights() {
             icon: Activity,
             label: "Total Transactions",
             value: data.total_txn_count.toLocaleString(),
-            sub: `${data.income_txn_count} credits · ${data.expense_txn_count} debits; transfers and pending excluded`,
-            accent: "text-blue-400",
+            sub: `${data.income_txn_count} credits · ${data.expense_txn_count} debits; posted rows include transfers, pending excluded`,
+            accent: "text-black",
         },
         {
             icon: Store,
             label: "Unique Merchants",
             value: data.unique_merchants.toLocaleString(),
-            sub: "Distinct payees across all transactions",
-            accent: "text-violet-400",
+            sub: "Distinct payees on non-transfer debits",
+            accent: "text-black",
         },
         {
             icon: Banknote,
             label: "Credit Transactions",
             value: data.income_txn_count.toLocaleString(),
-            sub: "Total credit entries recorded",
-            accent: "text-emerald-400",
+            sub: "All posted credit rows, including transfers",
+            accent: "text-black",
         },
         {
             icon: TrendingDown,
             label: "No-Spend Days",
             value: data.no_spend_days.toLocaleString(),
             sub: "Between your first and last transaction dates",
-            accent: "text-sky-400",
+            accent: "text-black",
         },
         {
             icon: Tags,
@@ -198,7 +199,7 @@ export default function SpendingInsights() {
             sub: data.top_category
                 ? `${formatNaira(data.top_category_amount)} · ${data.top_category_share_percent.toFixed(1)}% of spending`
                 : "No categorized spending",
-            accent: "text-fuchsia-400",
+            accent: "text-black",
         },
         {
             icon: Send,
@@ -207,7 +208,7 @@ export default function SpendingInsights() {
             sub: data.top_recipient
                 ? `${data.top_recipient_transfer_count} transfers · ${formatNaira(data.top_recipient_transfer_amount)} total`
                 : "No outgoing transfers with a named recipient",
-            accent: "text-indigo-400",
+            accent: "text-black",
         },
     ]
 
@@ -217,7 +218,7 @@ export default function SpendingInsights() {
                 <div>
                     <h3 className="text-sm font-semibold text-foreground">Spending Insights</h3>
                     <p className="text-xs text-muted-foreground mt-0.5">
-                        Key metrics for {PERIODS.find((option) => option.value === period)?.label.toLowerCase()}
+                        Non-transfer spending metrics for {PERIODS.find((option) => option.value === period)?.label.toLowerCase()}
                     </p>
                 </div>
                 <PeriodFilters period={period} onChange={setPeriod} />

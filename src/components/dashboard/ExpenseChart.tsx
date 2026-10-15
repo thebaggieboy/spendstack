@@ -51,7 +51,7 @@ export default function ExpenseChart() {
                 </div>
                 <div className="text-center space-y-1">
                     <p className="font-medium text-foreground">No cash flow data yet</p>
-                    <p className="text-sm text-muted-foreground">Upload a bank statement to see your credits vs spending chart.</p>
+                    <p className="text-sm text-muted-foreground">Upload a bank statement to see your posted credits vs debits.</p>
                 </div>
             </Card>
         )
@@ -64,7 +64,7 @@ export default function ExpenseChart() {
                     <LineChartIcon className="h-5 w-5 text-emerald-400" />
                     Cash Flow Overview
                 </CardTitle>
-                <CardDescription>Recorded credits vs spending, excluding transfers and pending transactions</CardDescription>
+                <CardDescription>Posted credits vs debits, including transfers and excluding pending transactions</CardDescription>
             </CardHeader>
             <CardContent className="pl-0">
                 <div className="h-[300px] w-full mt-4">
@@ -128,7 +128,7 @@ export default function ExpenseChart() {
                                 fillOpacity={1}
                                 fill="url(#colorExpenses)"
                                 activeDot={{ r: 5, fill: '#f43f5e', strokeWidth: 0 }}
-                                name="Expenses"
+                                name="Debits"
                             />
                         </AreaChart>
                     </ResponsiveContainer>
@@ -142,7 +142,7 @@ export default function ExpenseChart() {
                     </span>
                     <span className="flex items-center gap-2">
                         <span className="inline-block h-2.5 w-2.5 rounded-full bg-rose-400" />
-                        Expenses
+                        Debits
                     </span>
                 </div>
             </CardContent>

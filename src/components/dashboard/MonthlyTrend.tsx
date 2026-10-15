@@ -60,7 +60,7 @@ const CustomTooltip = ({
                 <span className="text-emerald-400 font-medium">{formatNaira(income)}</span>
             </p>
             <p className="flex justify-between gap-6">
-                <span className="text-muted-foreground">Expenses</span>
+                <span className="text-muted-foreground">Debits</span>
                 <span className="text-rose-400 font-medium">{formatNaira(expenses)}</span>
             </p>
             <div className="border-t border-border pt-1.5 mt-1">
@@ -117,7 +117,7 @@ export default function MonthlyTrend() {
                         <BarChart3 className="h-5 w-5 text-violet-400" />
                         Monthly Trend
                     </CardTitle>
-                    <CardDescription>Recorded credits vs spending, excluding transfers and pending transactions</CardDescription>
+                    <CardDescription>Posted credits vs debits, including transfers and excluding pending transactions</CardDescription>
                 </div>
 
                 {/* Summary pills */}
@@ -128,7 +128,7 @@ export default function MonthlyTrend() {
                     </span>
                     <span className="flex items-center gap-1.5 text-muted-foreground">
                         <span className="h-2 w-2 rounded-sm bg-rose-400 inline-block" />
-                        Expenses
+                        Debits
                     </span>
                 </div>
             </CardHeader>
@@ -168,7 +168,7 @@ export default function MonthlyTrend() {
                                 ))}
                             </Bar>
 
-                            <Bar dataKey="expenses" name="Expenses" radius={[4, 4, 0, 0]} maxBarSize={32}>
+                            <Bar dataKey="expenses" name="Debits" radius={[4, 4, 0, 0]} maxBarSize={32}>
                                 {rawData.map((_, i) => (
                                     <Cell key={i} fill="#f43f5e" fillOpacity={0.85} />
                                 ))}

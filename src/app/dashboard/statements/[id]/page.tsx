@@ -3,7 +3,6 @@
 import { useParams, useRouter } from "next/navigation"
 import useSWR from "swr"
 import { fetchWithAuth as fetcher } from "@/lib/fetcher"
-import { formatNaira } from "@/lib/utils"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/Card"
 import {
     FileText, Calendar, ArrowUpRight, ArrowDownRight, TrendingUp, TrendingDown,
@@ -23,20 +22,28 @@ type StatementTransaction = {
     raw_description: string
     merchant_name: string
     amount: number
+    currency: string
+    source_id: string
     category: string
     category_color: string
     cumulative_flow: number
     is_transfer: boolean
+    is_pending: boolean
 }
 
 type StatementDetail = {
     filename: string
+    currency: string
+    parser_warnings: string[]
     upload_date: string
     stats: {
         total_credits: number
         total_expenses: number
         net: number
         transaction_count: number
+        credit_count: number
+        debit_count: number
+        pending_transaction_count: number
         merchant_count: number
         highest_daily_spend: number
         highest_daily_spend_date: string | null
@@ -48,8 +55,21 @@ type StatementDetail = {
             closing_balance: string | null
             total_credits: string | null
             total_debits: string | null
+            credit_count: string | null
+            debit_count: string | null
         }
         ambiguous_fields: string[]
+        incomplete_fields: string[]
+        sheet_summaries: {
+            sheet: string
+            opening_balance?: string | null
+            closing_balance?: string | null
+            total_credits?: string | null
+            total_debits?: string | null
+            credit_count?: string | null
+            debit_count?: string | null
+            ambiguous_fields?: string[]
+        }[]
         checks: Record<string, {
             status: "match" | "mismatch" | "review" | "unavailable"
             reported: number | null
@@ -72,21 +92,32 @@ type StatementDetail = {
 
 type TooltipItem = { color?: string; stroke?: string; name?: string; value?: number }
 
+function formatMoney(value: number, currency = "NGN") {
+    return new Intl.NumberFormat("en", {
+        style: "currency",
+        currency: currency || "NGN",
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+    }).format(value)
+}
+
 const CustomTooltip = ({
     active,
     payload,
     label,
+    currency,
 }: {
     active?: boolean
     payload?: TooltipItem[]
     label?: string | number
+    currency?: string
 }) => {
     if (active && payload && payload.length) {
         return (
             <div className="bg-white border border-border rounded-xl p-3 text-sm shadow-lg">
                 <p className="font-semibold text-foreground mb-1">{label}</p>
                 {payload.map((p, i) => (
-                    <p key={i} style={{ color: p.color || p.stroke }}>{p.name}: {formatNaira(Math.abs(Number(p.value ?? 0)))}</p>
+                    <p key={i} style={{ color: p.color || p.stroke }}>{p.name}: {formatMoney(Math.abs(Number(p.value ?? 0)), currency)}</p>
                 ))}
             </div>
         )
@@ -124,7 +155,7 @@ export default function StatementDetailPage() {
         )
     }
 
-    const { filename, upload_date, stats, transactions, category_breakdown, daily_data, statement_reconciliation } = data
+    const { filename, upload_date, stats, transactions, category_breakdown, daily_data, statement_reconciliation, currency } = data
 
     const filteredTx = transactions?.filter(tx =>
         tx.merchant_name?.toLowerCase().includes(search.toLowerCase()) ||
@@ -137,12 +168,22 @@ export default function StatementDetailPage() {
         "Cumulative flow": tx.cumulative_flow,
     })) ?? []
 
+    const reported = statement_reconciliation.statement_summary
+    const balanceSummaryText = (field: "opening_balance" | "closing_balance") => {
+        if (statement_reconciliation.ambiguous_fields.includes(field)) return "Conflicting values"
+        if (statement_reconciliation.incomplete_fields.includes(field)) return "Not available for every account sheet"
+        const value = reported[field]
+        return value === null ? "Not reported" : formatMoney(Number(value), currency)
+    }
     const statCards = [
-        { label: "Total Credits", value: formatNaira(stats.total_credits), icon: TrendingUp, color: "emerald", colorHex: "#22c55e" },
-        { label: "Total Expenses", value: formatNaira(stats.total_expenses), icon: TrendingDown, color: "rose", colorHex: "#f43f5e" },
-        { label: "Net Cash Flow", value: formatNaira(Math.abs(stats.net)), sub: stats.net >= 0 ? "positive" : "negative", icon: Wallet, color: stats.net >= 0 ? "emerald" : "rose", colorHex: stats.net >= 0 ? "#22c55e" : "#f43f5e" },
-        { label: "Unique Merchants", value: stats.merchant_count, icon: Store, color: "blue", colorHex: "#3b82f6" },
-        { label: "Highest Daily Spend", value: formatNaira(stats.highest_daily_spend), sub: stats.highest_daily_spend_date ? `On ${stats.highest_daily_spend_date}` : "No spending", icon: TrendingDown, color: "rose", colorHex: "#f43f5e" },
+        { label: "Total Credits", value: reported.total_credits === null ? formatMoney(stats.total_credits, currency) : formatMoney(Number(reported.total_credits), currency), sub: reported.total_credits === null ? "Parsed transaction rows · statement total not found" : "From the uploaded statement", icon: TrendingUp, color: "emerald", colorHex: "#22c55e" },
+        { label: "Total Debits", value: reported.total_debits === null ? formatMoney(stats.total_expenses, currency) : formatMoney(Number(reported.total_debits), currency), sub: reported.total_debits === null ? "Parsed transaction rows · statement total not found" : "From the uploaded statement", icon: TrendingDown, color: "rose", colorHex: "#f43f5e" },
+        { label: "Opening Balance", value: reported.opening_balance === null ? "Not in statement" : formatMoney(Number(reported.opening_balance), currency), icon: Wallet, color: "blue", colorHex: "#3b82f6" },
+        { label: "Closing Balance", value: reported.closing_balance === null ? "Not in statement" : formatMoney(Number(reported.closing_balance), currency), icon: Wallet, color: "blue", colorHex: "#3b82f6" },
+        { label: "Credit Count", value: reported.credit_count === null ? stats.credit_count.toLocaleString() : Number(reported.credit_count).toLocaleString(), sub: reported.credit_count === null ? "Parsed posted rows · statement count not found" : "From the uploaded statement", icon: TrendingUp, color: "emerald", colorHex: "#22c55e" },
+        { label: "Debit Count", value: reported.debit_count === null ? stats.debit_count.toLocaleString() : Number(reported.debit_count).toLocaleString(), sub: reported.debit_count === null ? "Parsed posted rows · statement count not found" : "From the uploaded statement", icon: TrendingDown, color: "rose", colorHex: "#f43f5e" },
+        { label: "Highest Daily Spend", value: formatMoney(stats.highest_daily_spend, currency), sub: stats.highest_daily_spend_date ? `On ${stats.highest_daily_spend_date}` : "No spending", icon: TrendingDown, color: "rose", colorHex: "#f43f5e" },
+        { label: "Unique Merchants", value: stats.merchant_count.toLocaleString(), icon: Store, color: "blue", colorHex: "#3b82f6" },
     ]
 
     const reconciliationTone = {
@@ -178,7 +219,7 @@ export default function StatementDetailPage() {
                                 <Calendar className="h-3.5 w-3.5" />
                                 <span>Uploaded {upload_date}</span>
                                 <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-emerald-50 text-emerald-700 border border-emerald-200">
-                                    {stats.transaction_count} transactions
+                                    {stats.transaction_count} posted transactions · {stats.pending_transaction_count} pending
                                 </span>
                             </div>
                         </div>
@@ -187,7 +228,7 @@ export default function StatementDetailPage() {
             </div>
 
             {/* Summary Cards */}
-            <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
                 {statCards.map((c) => (
                     <Card key={c.label}>
                         <CardContent className="p-4 pl-5">
@@ -210,7 +251,7 @@ export default function StatementDetailPage() {
                     <div className="flex flex-wrap items-center justify-between gap-3">
                         <div>
                             <CardTitle>Statement reconciliation</CardTitle>
-                            <CardDescription>Transaction rows are compared with explicitly printed statement totals; printed values never replace the row calculations.</CardDescription>
+                            <CardDescription>Statement-reported totals and balances are shown alongside parsed posted-row totals and counts so discrepancies stay visible.</CardDescription>
                         </div>
                         <span className={`inline-flex items-center gap-2 border px-3 py-1.5 text-xs font-medium uppercase ${reconciliationTone}`}>
                             {(() => {
@@ -222,39 +263,86 @@ export default function StatementDetailPage() {
                     </div>
                 </CardHeader>
                 <CardContent className="space-y-4">
+                    {data.parser_warnings.length > 0 && (
+                        <div role="alert" className="border border-amber-200 bg-amber-50 p-3 text-sm text-amber-900">
+                            <p className="font-medium">Parser warnings ({data.parser_warnings.length})</p>
+                            <ul className="mt-2 max-h-32 list-inside list-disc overflow-y-auto">
+                                {data.parser_warnings.slice(0, 50).map((warning, index) => (
+                                    <li key={`${index}-${warning}`}>{warning}</li>
+                                ))}
+                            </ul>
+                        </div>
+                    )}
                     <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
                         {([
-                            ["Total credits", "total_credits"],
-                            ["Total debits", "total_debits"],
-                        ] as const).map(([label, key]) => {
+                            ["Total credits", "total_credits", true],
+                            ["Total debits", "total_debits", true],
+                            ["Credit count", "credit_count", false],
+                            ["Debit count", "debit_count", false],
+                        ] as const).map(([label, key, isMoney]) => {
                             const check = statement_reconciliation.checks[key]
+                            const displayValue = (value: number | null) => value === null
+                                ? "Not found"
+                                : isMoney ? formatMoney(value, currency) : value.toLocaleString()
                             return (
                                 <div key={key} className="border border-border p-3">
                                     <p className="text-xs text-muted-foreground">{label}</p>
-                                    <p className="mt-1 font-semibold">{formatNaira(check.from_transactions)}</p>
+                                    <p className="mt-1 font-semibold">Parsed rows: {displayValue(check.from_transactions)}</p>
                                     <p className="mt-1 text-xs text-muted-foreground">
-                                        Printed: {check.reported === null ? (check.status === "review" ? "conflicting values" : "not found") : formatNaira(check.reported)}
+                                        Printed: {check.reported === null
+                                            ? (check.status === "review"
+                                                ? statement_reconciliation.ambiguous_fields.includes(key)
+                                                    ? "conflicting values"
+                                                    : "not available on every account sheet"
+                                                : "not found")
+                                            : displayValue(check.reported)}
                                     </p>
-                                    {check.status === "mismatch" && <p className="mt-1 text-xs text-rose-700">Difference: {formatNaira(Math.abs(check.difference ?? 0))}</p>}
+                                    {check.status === "mismatch" && <p className="mt-1 text-xs text-rose-700">Difference: {displayValue(Math.abs(check.difference ?? 0))}</p>}
                                 </div>
                             )
                         })}
                         <div className="border border-border p-3">
                             <p className="text-xs text-muted-foreground">Opening balance</p>
-                            <p className="mt-1 font-semibold">{statement_reconciliation.ambiguous_fields.includes("opening_balance") ? "Conflicting values" : statement_reconciliation.statement_summary.opening_balance === null ? "Not found" : formatNaira(Number(statement_reconciliation.statement_summary.opening_balance))}</p>
+                            <p className="mt-1 font-semibold">{balanceSummaryText("opening_balance")}</p>
                         </div>
                         <div className="border border-border p-3">
                             <p className="text-xs text-muted-foreground">Closing balance</p>
-                            <p className="mt-1 font-semibold">{statement_reconciliation.ambiguous_fields.includes("closing_balance") ? "Conflicting values" : statement_reconciliation.statement_summary.closing_balance === null ? "Not found" : formatNaira(Number(statement_reconciliation.statement_summary.closing_balance))}</p>
+                            <p className="mt-1 font-semibold">{balanceSummaryText("closing_balance")}</p>
                         </div>
                     </div>
                     <div className={`border p-3 text-sm ${reconciliationTone}`}>
                         {statement_reconciliation.balance_movement.status === "match" || statement_reconciliation.balance_movement.status === "mismatch"
-                            ? <>Balance movement: {formatNaira(statement_reconciliation.balance_movement.reported_movement ?? 0)}; posted transaction net: {formatNaira(statement_reconciliation.balance_movement.transaction_net ?? 0)}.{statement_reconciliation.balance_movement.status === "mismatch" ? ` Difference: ${formatNaira(Math.abs(statement_reconciliation.balance_movement.difference ?? 0))}.` : " These amounts match."}</>
+                            ? <>Balance movement: {formatMoney(statement_reconciliation.balance_movement.reported_movement ?? 0, currency)}; posted transaction net: {formatMoney(statement_reconciliation.balance_movement.transaction_net ?? 0, currency)}.{statement_reconciliation.balance_movement.status === "mismatch" ? ` Difference: ${formatMoney(Math.abs(statement_reconciliation.balance_movement.difference ?? 0), currency)}.` : " These amounts match."}</>
                             : statement_reconciliation.balance_movement.status === "review"
                                 ? "Opening or closing balance appears more than once with conflicting values; balance movement could not be verified."
                                 : "Balance movement could not be verified because the statement did not provide both opening and closing balances."}
                     </div>
+                    {statement_reconciliation.sheet_summaries.length > 1 && (
+                        <div className="space-y-2">
+                            <h3 className="text-sm font-semibold">Reported totals by account sheet</h3>
+                            <div className="grid gap-3 md:grid-cols-2">
+                                {statement_reconciliation.sheet_summaries.map(sheet => (
+                                    <div key={sheet.sheet} className="border border-border p-3">
+                                        <p className="text-sm font-medium">{sheet.sheet}</p>
+                                        <div className="mt-2 grid grid-cols-2 gap-x-3 gap-y-1 text-xs text-muted-foreground">
+                                            <span>Opening balance</span>
+                                            <span className="text-right">{sheet.opening_balance ? formatMoney(Number(sheet.opening_balance), currency) : "Not reported"}</span>
+                                            <span>Closing balance</span>
+                                            <span className="text-right">{sheet.closing_balance ? formatMoney(Number(sheet.closing_balance), currency) : "Not reported"}</span>
+                                            <span>Credits</span>
+                                            <span className="text-right">{sheet.total_credits !== undefined && sheet.total_credits !== null ? formatMoney(Number(sheet.total_credits), currency) : "Not reported"}</span>
+                                            <span>Debits</span>
+                                            <span className="text-right">{sheet.total_debits !== undefined && sheet.total_debits !== null ? formatMoney(Number(sheet.total_debits), currency) : "Not reported"}</span>
+                                            <span>Credit count</span>
+                                            <span className="text-right">{sheet.credit_count ?? "Not reported"}</span>
+                                            <span>Debit count</span>
+                                            <span className="text-right">{sheet.debit_count ?? "Not reported"}</span>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    )}
                 </CardContent>
             </Card>
 
@@ -277,8 +365,8 @@ export default function StatementDetailPage() {
                                 </defs>
                                 <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
                                 <XAxis dataKey="date" tick={{ fontSize: 10, fill: "#71717a" }} interval="preserveStartEnd" />
-                                <YAxis tickFormatter={v => formatNaira(v)} tick={{ fontSize: 10, fill: "#71717a" }} />
-                                <Tooltip content={<CustomTooltip />} />
+                                <YAxis tickFormatter={v => formatMoney(v, currency)} tick={{ fontSize: 10, fill: "#71717a" }} />
+                                <Tooltip content={<CustomTooltip currency={currency} />} />
                                 <Area type="monotone" dataKey="Cumulative flow" stroke="#6366f1" strokeWidth={2} fill="url(#balGrad)" dot={false} />
                             </AreaChart>
                         </ResponsiveContainer>
@@ -305,7 +393,7 @@ export default function StatementDetailPage() {
                                         ))}
                                     </Pie>
                                     <Tooltip
-                                        formatter={value => formatNaira(Number(value ?? 0))}
+                                        formatter={value => formatMoney(Number(value ?? 0), currency)}
                                         contentStyle={{ background: "#ffffff", color: "#18181b", border: "1px solid #e4e4e7", borderRadius: "12px", fontSize: "12px" }}
                                     />
                                     <Legend iconType="circle" iconSize={8} wrapperStyle={{ fontSize: "11px" }} />
@@ -329,8 +417,8 @@ export default function StatementDetailPage() {
                         <BarChart data={daily_data}>
                             <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
                             <XAxis dataKey="date" tick={{ fontSize: 10, fill: "#71717a" }} />
-                            <YAxis tickFormatter={v => formatNaira(v)} tick={{ fontSize: 10, fill: "#71717a" }} />
-                            <Tooltip content={<CustomTooltip />} />
+                            <YAxis tickFormatter={v => formatMoney(v, currency)} tick={{ fontSize: 10, fill: "#71717a" }} />
+                            <Tooltip content={<CustomTooltip currency={currency} />} />
                             <Legend iconType="circle" iconSize={8} wrapperStyle={{ fontSize: "11px" }} />
                             <Bar dataKey="credits" name="Credits" fill="#22c55e" radius={[3, 3, 0, 0]} />
                             <Bar dataKey="expenses" name="Expenses" fill="#f43f5e" radius={[3, 3, 0, 0]} />
@@ -386,6 +474,7 @@ export default function StatementDetailPage() {
                                                 <div className="min-w-0">
                                                     <p className="text-sm font-medium text-foreground truncate">{tx.merchant_name}</p>
                                                     <p className="text-xs text-muted-foreground truncate">{tx.raw_description}</p>
+                                                    {tx.is_pending && <span className="mt-1 inline-block rounded-full bg-amber-50 px-2 py-0.5 text-[10px] text-amber-800">Pending · excluded from totals</span>}
                                                 </div>
                                             </div>
                                             <div className="col-span-2">
@@ -398,10 +487,10 @@ export default function StatementDetailPage() {
                                             </div>
                                             <div className="col-span-2 text-right text-xs text-muted-foreground">{tx.date}</div>
                                             <div className={`col-span-2 text-right text-sm font-bold ${tx.amount > 0 ? "text-emerald-700" : "text-foreground"}`}>
-                                                {tx.amount > 0 ? "+" : ""}{formatNaira(Math.abs(tx.amount))}
+                                                {tx.amount > 0 ? "+" : ""}{formatMoney(Math.abs(tx.amount), tx.currency || currency)}
                                             </div>
                                             <div className="col-span-1 text-right text-xs text-muted-foreground font-mono">
-                                                {formatNaira(tx.cumulative_flow)}
+                                                {formatMoney(tx.cumulative_flow, tx.currency || currency)}
                                             </div>
                                         </div>
                                     ))

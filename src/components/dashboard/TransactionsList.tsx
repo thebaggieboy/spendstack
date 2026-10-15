@@ -3,11 +3,21 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/Card"
 import { ListFilter, ArrowDownRight, ArrowUpRight } from "lucide-react"
 import useSWR from 'swr'
-import { formatNaira } from '@/lib/utils';
 import { fetchWithAuth as fetcher } from '@/lib/fetcher';
 
+type RecentTransaction = {
+    id: number
+    name: string
+    amount: number
+    currency: string
+    date: string
+    category: string
+    status: string
+    is_transfer: boolean
+}
+
 export default function TransactionsList() {
-    const { data: transactions, error, isLoading } = useSWR(`${process.env.NEXT_PUBLIC_API_URL}dashboard/transactions/recent/`, fetcher)
+    const { data: transactions, error, isLoading } = useSWR<RecentTransaction[]>(`${process.env.NEXT_PUBLIC_API_URL}dashboard/transactions/recent/`, fetcher)
 
     if (isLoading) {
         return <Card className="col-span-1 lg:col-span-3 h-[400px] animate-pulse bg-muted" />
@@ -21,8 +31,8 @@ export default function TransactionsList() {
         )
     }
 
-    const formatNaira = (amount: number) => {
-        return new Intl.NumberFormat('en-NG', { style: 'currency', currency: 'NGN' }).format(amount)
+    const formatMoney = (amount: number, currency = "NGN") => {
+        return new Intl.NumberFormat("en", { style: "currency", currency }).format(amount)
     }
 
     return (
@@ -39,7 +49,7 @@ export default function TransactionsList() {
             </CardHeader>
             <CardContent className="flex-1 overflow-y-auto custom-scrollbar pr-2 mt-2">
                 <div className="space-y-2">
-                    {transactions.map((tx: any) => (
+                    {transactions.map(tx => (
                         <div key={tx.id} className="flex items-center justify-between p-3 rounded-xl hover:bg-muted/60 transition-all border border-transparent hover:border-border group cursor-pointer">
                             <div className="flex items-center gap-4">
                                 <div className={`p-3 rounded-xl flex items-center justify-center ${tx.amount > 0
@@ -59,7 +69,7 @@ export default function TransactionsList() {
                             </div>
                             <div className="text-right">
                                 <p className={`text-sm font-semibold ${tx.amount > 0 ? "text-emerald-700" : "text-foreground"}`}>
-                                    {tx.amount > 0 ? "+" : ""}{formatNaira(Math.abs(tx.amount))}
+                                    {tx.amount > 0 ? "+" : ""}{formatMoney(Math.abs(tx.amount), tx.currency || "NGN")}
                                 </p>
                                 {tx.status === 'pending' && (
                                     <p className="text-[10px] uppercase font-bold text-amber-500 mt-1 tracking-wider">Pending</p>

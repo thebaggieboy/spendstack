@@ -23,6 +23,7 @@ type BankAccount = {
     bank_name: string
     account_name: string
     account_last4: string
+    bank_code:string
     is_default: boolean
 }
 type Lock = {
@@ -312,7 +313,7 @@ export default function LockMoneyPage() {
                 <Card>
                     <CardHeader>
                         <CardTitle className="flex items-center gap-2"><Plus className="h-5 w-5 text-primary" />Verify payout account</CardTitle>
-                        <CardDescription>Paystack verifies the account and stores it as a payout recipient. Spendstack only saves the account name and last four digits.</CardDescription>
+                        <CardDescription>Paystack provides the Nigerian banks enabled for account verification. Paystack verifies the account and stores it as a payout recipient; Spendstack only saves the account name and last four digits.</CardDescription>
                     </CardHeader>
                     <CardContent>
                         {accountsError && <p role="alert" className="mb-3 text-xs text-red-700">Could not load saved payout accounts.</p>}
@@ -331,7 +332,7 @@ export default function LockMoneyPage() {
                             </div>
                         )}
                         {banksError ? (
-                            <p role="alert" className="text-sm text-red-700">Bank list unavailable. Check Paystack credentials and account permissions.</p>
+                            <p role="alert" className="text-sm text-red-700">Bank list unavailable. Check the Paystack secret key configured on the server.</p>
                         ) : (
                             <form onSubmit={addBankAccount} className="space-y-3">
                                 <label className="block space-y-1 text-xs font-medium text-foreground">

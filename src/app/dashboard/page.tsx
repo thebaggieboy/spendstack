@@ -1,6 +1,5 @@
 import OverviewCards from "@/components/dashboard/OverviewCards"
 import TransactionsList from "@/components/dashboard/TransactionsList"
-import TopMerchants from "@/components/dashboard/TopMerchants"
 import Link from "next/link"
 import { ArrowUpRight, BarChart3, Sparkles } from "lucide-react"
 
@@ -17,7 +16,7 @@ export default function Home() {
           </p>
           <h1 className="text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">Dashboard</h1>
           <p className="mt-3 max-w-xl text-sm text-muted-foreground">
-            Your money at a glance, with recent transactions and your top merchants. Explore Analytics for detailed trends and insights.
+            Current balances, period cash flow, and items that need attention. Explore Analytics for detailed trends and category insights.
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-3 self-start sm:self-center">
@@ -40,10 +39,7 @@ export default function Home() {
 
       <OverviewCards />
 
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-5">
-        <TransactionsList />
-        <TopMerchants />
-      </div>
+      <TransactionsList />
 
     </div>
   )

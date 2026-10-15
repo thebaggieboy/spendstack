@@ -5,7 +5,6 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Input } from "@/components/ui/Input"
 import { Search, ArrowDownRight, ArrowUpRight, ListFilter, Download, Calendar, Loader2 } from "lucide-react"
 import useSWR from "swr"
-import { formatNaira } from '@/lib/utils';
 import { fetchWithAuth as fetcher } from '@/lib/fetcher';
 import { useSearchParams } from 'next/navigation'
 import { Suspense } from "react"
@@ -14,10 +13,20 @@ interface TransactionRow {
     id: number
     name: string
     amount: number
+    currency: string
     date: string
     category: string
     status: string
     is_transfer: boolean
+}
+
+function formatMoney(amount: number, currency: string) {
+    return new Intl.NumberFormat("en", {
+        style: "currency",
+        currency: currency || "NGN",
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+    }).format(amount)
 }
 
 function TransactionsContent() {
@@ -127,7 +136,7 @@ function TransactionsContent() {
                                             </div>
                                             <div className="col-span-2 text-right">
                                                 <p className={`text-sm font-semibold ${tx.amount > 0 ? "text-emerald-700" : "text-foreground"}`}>
-                                                    {tx.amount > 0 ? "+" : ""}{formatNaira(Math.abs(tx.amount))}
+                                                    {tx.amount > 0 ? "+" : ""}{formatMoney(Math.abs(tx.amount), tx.currency)}
                                                 </p>
                                             </div>
                                         </div>

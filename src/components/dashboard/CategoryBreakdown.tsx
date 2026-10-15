@@ -8,6 +8,10 @@ import { formatNaira } from '@/lib/utils';
 import { fetchWithAuth as fetcher } from '@/lib/fetcher';
 
 const cardBase = "col-span-1 lg:col-span-3"
+const categoryColors = [
+    "#6366f1", "#f97316", "#14b8a6", "#ec4899", "#eab308", "#8b5cf6",
+    "#06b6d4", "#ef4444", "#84cc16", "#f43f5e", "#0ea5e9", "#a855f7",
+]
 
 const formatNairaTooltip = (value: number) =>
     new Intl.NumberFormat('en-NG', { style: 'currency', currency: 'NGN' }).format(value)
@@ -48,6 +52,10 @@ export default function CategoryBreakdown() {
     }
 
     const totalSpent = rawData.reduce((acc: number, curr: any) => acc + curr.value, 0)
+    const chartData = rawData.map((item: any, index: number) => ({
+        ...item,
+        color: categoryColors[index % categoryColors.length],
+    }))
 
     return (
         <Card className={cardBase}>
@@ -85,7 +93,7 @@ export default function CategoryBreakdown() {
                                 itemStyle={{ color: '#18181b' }}
                             />
                             <Pie
-                                data={rawData}
+                                data={chartData}
                                 cx="50%"
                                 cy="50%"
                                 innerRadius={80}
@@ -94,7 +102,7 @@ export default function CategoryBreakdown() {
                                 dataKey="value"
                                 stroke="none"
                             >
-                                {rawData.map((entry: any, index: number) => (
+                                {chartData.map((entry: any, index: number) => (
                                     <Cell key={`cell-${index}`} fill={entry.color} />
                                 ))}
                             </Pie>
@@ -104,7 +112,7 @@ export default function CategoryBreakdown() {
 
                 {/* Legend */}
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mt-4">
-                    {rawData.map((item: any) => (
+                    {chartData.map((item: any) => (
                         <div key={item.name} className="flex items-center space-x-2">
                             <div
                                 className="h-2.5 w-2.5 rounded-full flex-shrink-0"

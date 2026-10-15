@@ -24,6 +24,7 @@ import { useAuth } from "@/contexts/AuthContext"
 
 const routes = [
     { label: "Dashboard",        icon: LayoutDashboard, href: "/dashboard",              color: "text-primary" },
+        { label: "Analytics",        icon: PieChart,         href: "/dashboard/analytics",   color: "text-purple-500" },
     { label: "Tools",            icon: Wrench,          href: "/dashboard/tools",        color: "text-primary" },
 
     //{ label: "Upload Statement", icon: Upload,           href: "/upload",                color: "text-emerald-500" },
@@ -31,10 +32,10 @@ const routes = [
     { label: "Transactions",     icon: ArrowRightLeft,   href: "/dashboard/transactions",color: "text-blue-500" },
     { label: "Chat",  icon: MessageCircle,   href: "/dashboard/chat",         color: "text-primary" },
     //{ label: "Money Tools",      icon: CalendarClock,    href: "/dashboard/money-tools", color: "text-amber-500" },
-    { label: "Analytics",        icon: PieChart,         href: "/dashboard/analytics",   color: "text-purple-500" },
+
     { label: "Tax Calculator",   icon: Receipt,          href: "/dashboard/tax",         color: "text-green-400" },
    // { label: "Budgets",          icon: Wallet,           href: "/dashboard/budgets",     color: "text-pink-500" },
-    { label: "AI Advisor",       icon: BrainCircuit,     href: "/dashboard/advisor",     color: "text-amber-500" },
+    //{ label: "AI Advisor",       icon: BrainCircuit,     href: "/dashboard/advisor",     color: "text-amber-500" },
    // { label: "Settings",         icon: Settings,         href: "/dashboard/settings",    color: "text-gray-500" },
 
     { label: "Admin analytics",  icon: ShieldCheck,      href: "/admin/analytics",       color: "text-primary", adminOnly: true },

@@ -96,6 +96,68 @@ export const requestWithAuth = async <T = unknown>(
     return res.json() as Promise<T>;
 };
 
+export const uploadWithAuth = async <T = unknown>(
+    url: string,
+    body: FormData,
+    onProgress: (percentage: number) => void,
+    signal?: AbortSignal,
+): Promise<T> => {
+    const send = (token: string | null) =>
+        new Promise<{ status: number; responseText: string }>((resolve, reject) => {
+            const xhr = new XMLHttpRequest();
+            xhr.open("POST", resolveApiRequestUrl(url));
+            if (token) xhr.setRequestHeader("Authorization", `Bearer ${token}`);
+            xhr.upload.onprogress = event => {
+                if (event.lengthComputable) {
+                    onProgress(Math.round((event.loaded / event.total) * 100));
+                }
+            };
+            xhr.onload = () => resolve({ status: xhr.status, responseText: xhr.responseText });
+            xhr.onerror = () => reject(new TypeError("Could not connect to the statement service."));
+            xhr.onabort = () => reject(new DOMException("Upload aborted.", "AbortError"));
+            if (signal) {
+                if (signal.aborted) {
+                    xhr.abort();
+                    return;
+                }
+                signal.addEventListener("abort", () => xhr.abort(), { once: true });
+            }
+            xhr.send(body);
+        });
+
+    let response = await send(localStorage.getItem("accessToken"));
+    if (response.status === 401) {
+        const refreshedToken = await attemptTokenRefresh();
+        if (refreshedToken) response = await send(refreshedToken);
+        if (response.status === 401) {
+            localStorage.removeItem("accessToken");
+            localStorage.removeItem("refreshToken");
+            window.location.href = "/login";
+            throw new Error("Session expired. Please log in again.");
+        }
+    }
+
+    let payload: unknown;
+    try {
+        payload = response.responseText ? JSON.parse(response.responseText) : undefined;
+    } catch {
+        throw new Error("The statement service returned an unreadable response.");
+    }
+    if (response.status < 200 || response.status >= 300) {
+        const detail =
+            typeof payload === "object" &&
+            payload !== null &&
+            "detail" in payload &&
+            typeof payload.detail === "string"
+                ? payload.detail
+                : "An error occurred while uploading the statement.";
+        const error = new Error(detail);
+        Object.assign(error, { info: payload, status: response.status });
+        throw error;
+    }
+    return payload as T;
+};
+
 type LegacyJsonResponse = ReturnType<typeof JSON.parse>
 
 export const fetchWithAuth = (url: string): Promise<LegacyJsonResponse> =>

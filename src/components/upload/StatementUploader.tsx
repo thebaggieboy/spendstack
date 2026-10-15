@@ -5,19 +5,23 @@ import { useRouter } from "next/navigation"
 import { AlertCircle, CheckCircle2, FileText, Loader2, Sparkles, Upload } from "lucide-react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/Card"
 import { Button } from "@/components/ui/Button"
-import { requestWithAuth } from "@/lib/fetcher"
+import { requestWithAuth, uploadWithAuth } from "@/lib/fetcher"
 
 type PreviewTransaction = {
     index: number
     source_row?: number
     source_sheet?: string
     source_page?: number
+    source_id?: string
     date: string
     description: string
     merchant: string
     category: string
     is_transfer: boolean
     amount: string
+    currency?: string
+    status?: string
+    is_pending?: boolean
 }
 
 type StatementPreview = {
@@ -25,6 +29,8 @@ type StatementPreview = {
     filename: string
     transactions: PreviewTransaction[]
     warnings: string[]
+    blocking_warnings: string[]
+    statement_summary: { currency?: string }
 }
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL
@@ -39,11 +45,12 @@ export default function StatementUploader() {
     const [error, setError] = useState<string | null>(null)
     const [summary, setSummary] = useState("")
     const [preview, setPreview] = useState<StatementPreview | null>(null)
+    const [uploadProgress, setUploadProgress] = useState<number | null>(null)
 
     const chooseFile = (candidate?: File) => {
         if (!candidate) return
-        if (!/\.(csv|pdf|xlsx|xls)$/i.test(candidate.name)) {
-            setError("Choose a CSV, Excel, or PDF statement.")
+        if (!/\.(csv|pdf|xlsx|xls|txt)$/i.test(candidate.name)) {
+            setError("Choose a CSV, Excel, PDF, or TXT statement.")
             return
         }
         if (candidate.size === 0) {
@@ -77,11 +84,13 @@ export default function StatementUploader() {
         formData.append("file", file)
 
         try {
-            const result = await requestWithAuth<StatementPreview>(`${API_URL}analysis/preview/`, {
-                method: "POST",
-                body: formData,
-                signal: controller.signal,
-            })
+            setUploadProgress(0)
+            const result = await uploadWithAuth<StatementPreview>(
+                `${API_URL}analysis/preview/`,
+                formData,
+                setUploadProgress,
+                controller.signal,
+            )
             setPreview(result)
         } catch (requestError) {
             setError(
@@ -96,6 +105,7 @@ export default function StatementUploader() {
         } finally {
             window.clearTimeout(timeoutId)
             setIsProcessing(false)
+            setUploadProgress(null)
         }
     }
 
@@ -155,7 +165,7 @@ export default function StatementUploader() {
                     Upload bank statement
                 </CardTitle>
                 <CardDescription>
-                    Review detected transactions before they are added to your account. CSV, Excel, and PDF files up to 10 MB are supported.
+                    Review detected transactions before they are added to your account. CSV, Excel, PDF, and TXT files up to 10 MB are supported.
                 </CardDescription>
             </CardHeader>
             <CardContent className="space-y-5">
@@ -178,15 +188,31 @@ export default function StatementUploader() {
                             id="file-upload"
                             type="file"
                             className="hidden"
-                            accept=".csv,.pdf,.xlsx,.xls"
+                            accept=".csv,.pdf,.xlsx,.xls,.txt"
                             onChange={event => chooseFile(event.target.files?.[0])}
                         />
                         {isProcessing ? (
                             <div className="flex flex-col items-center gap-4">
                                 <Loader2 className="h-10 w-10 animate-spin text-primary" />
                                 <div>
-                                    <p className="text-sm font-medium text-foreground">Reading and categorizing transactions…</p>
-                                    <p className="mt-1 max-w-xs text-xs leading-relaxed text-muted-foreground">PDFs and slower mobile connections can take a little longer. This request will stop after two minutes.</p>
+                                    <p className="text-sm font-medium text-foreground">
+                                        {uploadProgress === 100 ? "Upload complete. Parsing and categorizing transactions…" : "Uploading statement…"}
+                                    </p>
+                                    <p className="mt-1 max-w-xs text-xs leading-relaxed text-muted-foreground">
+                                        {uploadProgress === 100
+                                            ? "Transactions are parsed in bounded batches. Keep this page open while analysis finishes."
+                                            : `${uploadProgress ?? 0}% uploaded`}
+                                    </p>
+                                    <div
+                                        role="progressbar"
+                                        aria-label="Statement upload progress"
+                                        aria-valuemin={0}
+                                        aria-valuemax={100}
+                                        aria-valuenow={uploadProgress ?? 0}
+                                        className="mt-3 h-2 w-56 overflow-hidden rounded-full bg-muted"
+                                    >
+                                        <div className="h-full bg-primary transition-[width]" style={{ width: `${uploadProgress ?? 0}%` }} />
+                                    </div>
                                 </div>
                             </div>
                         ) : file ? (
@@ -213,7 +239,7 @@ export default function StatementUploader() {
                                 </div>
                                 <div>
                                     <p className="font-medium text-foreground">Click or drag a statement here</p>
-                                    <p className="text-sm text-muted-foreground">CSV, Excel, or PDF · Maximum 10 MB</p>
+                                    <p className="text-sm text-muted-foreground">CSV, Excel, PDF, or TXT · Maximum 10 MB</p>
                                 </div>
                             </div>
                         )}
@@ -231,7 +257,7 @@ export default function StatementUploader() {
                             </div>
                             <div className="flex gap-2">
                                 <Button variant="outline" onClick={() => void cancelPreview()} disabled={isProcessing}>Discard</Button>
-                                <Button onClick={() => void confirmImport()} disabled={isProcessing || preview.warnings.length > 0}>
+                                <Button onClick={() => void confirmImport()} disabled={isProcessing || preview.blocking_warnings.length > 0}>
                                     {isProcessing && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                                     Import transactions
                                 </Button>
@@ -239,9 +265,11 @@ export default function StatementUploader() {
                         </div>
                         {preview.warnings.length > 0 && (
                             <div role="alert" className="rounded-lg border border-amber-200 bg-amber-50 p-3 text-sm text-amber-900">
-                                <p className="mb-1 font-medium">{preview.warnings.length} row(s) need attention</p>
+                                <p className="mb-1 font-medium">{preview.warnings.length} row(s) skipped or flagged</p>
                                 <p className="mb-2">
-                                    Import is blocked to prevent partial or inaccurate data. Correct the statement and upload it again.
+                                    {preview.blocking_warnings.length
+                                        ? "Import is blocked because a transaction's debit or credit direction is ambiguous. Correct the statement and upload it again."
+                                        : "Valid rows can still be imported. The listed invalid rows will remain skipped."}
                                 </p>
                                 <ul className="max-h-24 list-inside list-disc overflow-y-auto">
                                     {preview.warnings.slice(0, 20).map((warning, index) => <li key={`${index}-${warning}`}>{warning}</li>)}
@@ -258,6 +286,7 @@ export default function StatementUploader() {
                                         <th className="px-3 py-2">Description</th>
                                         <th className="px-3 py-2">Merchant</th>
                                         <th className="px-3 py-2">Category</th>
+                                        <th className="px-3 py-2">Status</th>
                                         <th className="px-3 py-2 text-right">Amount</th>
                                     </tr>
                                 </thead>
@@ -280,8 +309,18 @@ export default function StatementUploader() {
                                                 {transaction.category}
                                                 {transaction.is_transfer && <span className="ml-1.5 rounded-full bg-blue-50 px-2 py-0.5 text-[10px] text-blue-800">Transfer</span>}
                                             </td>
+                                            <td className="px-3 py-2 text-foreground">
+                                                {transaction.is_pending
+                                                    ? <span className="rounded-full bg-amber-50 px-2 py-0.5 text-[10px] text-amber-800">Pending</span>
+                                                    : transaction.status ?? "Posted"}
+                                            </td>
                                             <td className={`whitespace-nowrap px-3 py-2 text-right font-medium ${Number(transaction.amount) < 0 ? "text-red-700" : "text-emerald-700"}`}>
-                                                {Number(transaction.amount) < 0 ? "−" : "+"}₦{Math.abs(Number(transaction.amount)).toLocaleString("en-NG", { minimumFractionDigits: 2 })}
+                                                {Number(transaction.amount) < 0 ? "−" : "+"}{new Intl.NumberFormat("en", {
+                                                    style: "currency",
+                                                    currency: transaction.currency || preview.statement_summary.currency || "NGN",
+                                                    minimumFractionDigits: 2,
+                                                    maximumFractionDigits: 2,
+                                                }).format(Math.abs(Number(transaction.amount)))}
                                             </td>
                                         </tr>
                                     ))}
