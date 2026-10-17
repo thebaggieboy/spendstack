@@ -48,6 +48,15 @@ const tools: {
         accent: "bg-emerald-50 text-emerald-700",
         label: "Planning",
     },
+    {
+        title: "Track subscriptions",
+        description: "Monitor your subscription services and manage renewals.",
+        href: "/dashboard/subscriptions",
+        icon: Tags,
+        accent: "bg-cyan-50 text-cyan-700",
+        label: "Monitoring",
+    },
+
  
  
     {
